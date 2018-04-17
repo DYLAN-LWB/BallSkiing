@@ -1,0 +1,40 @@
+{
+	"groups": [
+		{
+			"keys": "description_json,countdown_mp3,bg_mp3,guide_json,rocket_mp3,eat_mp3",
+			"name": "preload"
+		}
+	],
+	"resources": [
+		{
+			"url": "config/description.json",
+			"type": "json",
+			"name": "description_json"
+		},
+		{
+			"url": "sound/countdown.mp3",
+			"type": "sound",
+			"name": "countdown_mp3"
+		},
+		{
+			"url": "sound/bg.mp3",
+			"type": "sound",
+			"name": "bg_mp3"
+		},
+		{
+			"url": "game/guide.json",
+			"type": "json",
+			"name": "guide_json"
+		},
+		{
+			"url": "sound/rocket.mp3",
+			"type": "sound",
+			"name": "rocket_mp3"
+		},
+		{
+			"url": "sound/eat.mp3",
+			"type": "sound",
+			"name": "eat_mp3"
+		}
+	]
+}
