@@ -29,6 +29,8 @@ var Games = (function (_super) {
         //常量设置
         this._stageW = this.stage.stageWidth;
         this._stageH = this.stage.stageHeight;
+        this._lastPointX = this._stageW / 2;
+        this._lastPointY = 400;
         this.setupViews();
         //添加触摸事件
         this.stage.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.touchBegin, this);
@@ -84,29 +86,19 @@ var Games = (function (_super) {
         }
         var locus = new egret.Shape();
         var addY = 0;
-        if (this._gameBg2.y > this._ball.y) {
-            addY = Math.abs(this._gameBg1.y) + this._ball.y;
+        if (this._gameBg1.y > (-this._stageH + this._ball.y) && this._gameBg1.y <= 400) {
             this._gameBg1.addChild(locus);
-        }
-        else if (this._gameBg2.y < this._ball.y && this._gameBg2.y > 0) {
-            addY = this._ball.y - this._gameBg2.y;
-            this._gameBg2.addChild(locus);
-        }
-        else if (this._gameBg1.y > this._ball.y) {
-            addY = Math.abs(this._gameBg2.y) + this._ball.y;
-            this._gameBg2.addChild(locus);
-        }
-        else if (this._gameBg1.y < this._ball.y && this._gameBg1.y > 0) {
             addY = this._ball.y - this._gameBg1.y;
-            this._gameBg1.addChild(locus);
         }
-        locus.x = this._ball.x;
-        locus.y = addY;
-        locus.width = 10;
-        locus.height = 10;
-        locus.graphics.beginFill(0xFF3030);
-        locus.graphics.drawRect(0, 0, 10, 10);
-        locus.graphics.endFill();
+        else if (this._gameBg2.y > (-this._stageH + this._ball.y) && this._gameBg2.y <= 400) {
+            this._gameBg2.addChild(locus);
+            addY = this._ball.y - this._gameBg2.y;
+        }
+        if (this._lastPointY > (this._stageH - 5)) {
+            this._lastPointY = 0;
+            console.log("?????????");
+        }
+        console.log("add bg2 = " + this._lastPointY + " to " + addY);
         if (this._moveToRight == true) {
             if (this._ball.x > (this._stageW - this._ball.width)) {
                 this._ball.x = this._stageW - this._ball.width;
@@ -125,11 +117,19 @@ var Games = (function (_super) {
                 this._ball.x -= this._moveSepped * 20;
             }
         }
+        // if(this._lastPointY > this._stageH && this._lastPointY < (this._stageH+this._moveSepped*20)) {
+        // 	this._lastPointY = -this._ball.width;
+        // 	addY = -this._ball.width*1.5;
+        // }
+        locus.graphics.lineStyle(6, 0xFF3030, 1, true);
+        locus.graphics.moveTo(this._lastPointX, this._lastPointY);
+        locus.graphics.lineTo(this._ball.x + this._ball.width / 2, addY);
+        this._lastPointX = this._ball.x + this._ball.width / 2;
+        this._lastPointY = addY;
     };
     Games.prototype.gameOverTest = function () {
-        alert("game over");
-        this.addEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
-        // this.removeEventListener();
+        console.log("game over");
+        this.removeEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
     };
     Games.prototype.touchBegin = function (event) {
         // //每次点击移除之前的动画

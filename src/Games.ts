@@ -16,6 +16,9 @@ class Games extends egret.DisplayObjectContainer {
 	private _stageH;	//舞台高度
 	private _backgroundChannel: egret.SoundChannel;	//游戏背景音乐
 
+	private _lastPointX;
+	private _lastPointY;
+
 	private _gameBg1;
 	private _gameBg2;
 
@@ -29,6 +32,8 @@ class Games extends egret.DisplayObjectContainer {
 		this._stageW = this.stage.stageWidth;
 		this._stageH = this.stage.stageHeight;
 
+		this._lastPointX = this._stageW/2;
+		this._lastPointY = 400;
 		this.setupViews();
 
 		//添加触摸事件
@@ -82,6 +87,8 @@ class Games extends egret.DisplayObjectContainer {
 
 	}
 
+
+
 	private frameObserve () {
 		this._gameBg1.y -= this._moveSepped*20;
 		this._gameBg2.y -= this._moveSepped*20;
@@ -98,28 +105,18 @@ class Games extends egret.DisplayObjectContainer {
 
 		let locus = new egret.Shape();
 		let addY = 0;
-		if(this._gameBg2.y > this._ball.y) {
-			addY = Math.abs(this._gameBg1.y) + this._ball.y;
+
+		if (this._gameBg1.y > (-this._stageH+this._ball.y) && this._gameBg1.y <= 400) {
 			this._gameBg1.addChild(locus);
-		} else if(this._gameBg2.y < this._ball.y && this._gameBg2.y > 0) {
-			addY = this._ball.y - this._gameBg2.y;
-			this._gameBg2.addChild(locus);
-		} else if(this._gameBg1.y > this._ball.y) {
-			addY = Math.abs(this._gameBg2.y) + this._ball.y;
-			this._gameBg2.addChild(locus);
-		} else if(this._gameBg1.y < this._ball.y && this._gameBg1.y > 0) {
 			addY = this._ball.y - this._gameBg1.y;
-			this._gameBg1.addChild(locus);
+		} else if (this._gameBg2.y > (-this._stageH+this._ball.y) && this._gameBg2.y <= 400){
+			this._gameBg2.addChild(locus);
+			addY = this._ball.y -this._gameBg2.y;
+		} 
+
+		if(this._lastPointY > (this._stageH-5)) {
+			this._lastPointY = 0;
 		}
-
-		locus.x = this._ball.x;
-		locus.y = addY;
-		locus.width = 10;
-		locus.height = 10;
-		locus.graphics.beginFill(0xFF3030);
-        locus.graphics.drawRect(0, 0, 10, 10);
-        locus.graphics.endFill();
-
 
 		if(this._moveToRight == true) {
 			if(this._ball.x > (this._stageW-this._ball.width)) {
@@ -136,6 +133,13 @@ class Games extends egret.DisplayObjectContainer {
 				this._ball.x -= this._moveSepped*20;
 			}
 		}
+	
+		locus.graphics.lineStyle(6,0xFF3030,1,true);
+		locus.graphics.moveTo(this._lastPointX, this._lastPointY);
+		locus.graphics.lineTo(this._ball.x + this._ball.width/2 , addY);
+
+		this._lastPointX = this._ball.x + this._ball.width/2;
+		this._lastPointY = addY;
 	}
 
 	private gameOverTest() {
