@@ -16,24 +16,25 @@ class Games extends egret.DisplayObjectContainer {
 	private _stageH;	//舞台高度
 	private _backgroundChannel: egret.SoundChannel;	//游戏背景音乐
 
-	private _lastPointX;
-	private _lastPointY;
+	private _lastLocusPointX;
+	private _lastLocusPointY;
 
 	private _gameBg1;
 	private _gameBg2;
 
 	//this game
 	private _ball = new egret.Sprite;	//小球
+	private _ballWH = 30;	//小球宽高
 	private _moveToRight:boolean = true;	//小球是否在向右移动
 	private _moveSepped = 0.3;	//小球移动速度
+
+	private _locusW = 10;	//轨迹宽度
 
 	private createGameScene() {
 		//常量设置
 		this._stageW = this.stage.stageWidth;
 		this._stageH = this.stage.stageHeight;
 
-		this._lastPointX = this._stageW/2;
-		this._lastPointY = 400;
 		this.setupViews();
 
 		//添加触摸事件
@@ -51,8 +52,6 @@ class Games extends egret.DisplayObjectContainer {
 			this._backgroundChannel.volume = 0.8;
 		}, this);
 		sound.load("resource/sound/bg.mp3");
-
-
 
 		//添加背景
 		this._gameBg1 = new egret.Sprite();
@@ -78,21 +77,23 @@ class Games extends egret.DisplayObjectContainer {
 		//添加对象
 		this._ball.x = this._stageW/2;
 		this._ball.y = 400;
-		this._ball.width = 20;
-		this._ball.height = 20;
+		this._ballWH = this._ballWH;
+		this._ball.height = this._ballWH;
 		this._ball.graphics.beginFill(0x00C5CD,1);
-		this._ball.graphics.drawCircle(10, 10, 10);
+		this._ball.graphics.drawCircle(this._ballWH/2, this._ballWH/2, this._ballWH/2);
 		this._ball.graphics.endFill();
 		this.addChild(this._ball);
 
+		this._lastLocusPointX = this._stageW/2 + this._ballWH/2;
+		this._lastLocusPointY = 400;
 	}
 
-
-
+	//实时监听
 	private frameObserve () {
 		this._gameBg1.y -= this._moveSepped*20;
 		this._gameBg2.y -= this._moveSepped*20;
 
+		//重新设置背景位置,清空子视图
 		if (this._gameBg1.y == -this._stageH) {
 			this._gameBg1.removeChildren();
 			this._gameBg1.y = this._stageH;
@@ -103,85 +104,67 @@ class Games extends egret.DisplayObjectContainer {
 			this._gameBg2.y = this._stageH;
 		}
 
-		let locus = new egret.Shape();
-		let addY = 0;
+		//轨迹点
+		let locusPoint = new egret.Shape();
+		//点相对于背景图的位置
+		let addToBgY = 0;
 
+		//判断添加到哪个背景
 		if (this._gameBg1.y > (-this._stageH+this._ball.y) && this._gameBg1.y <= 400) {
-			this._gameBg1.addChild(locus);
-			addY = this._ball.y - this._gameBg1.y;
+			this._gameBg1.addChild(locusPoint);
+			addToBgY = this._ball.y - this._gameBg1.y;
 		} else if (this._gameBg2.y > (-this._stageH+this._ball.y) && this._gameBg2.y <= 400){
-			this._gameBg2.addChild(locus);
-			addY = this._ball.y -this._gameBg2.y;
+			this._gameBg2.addChild(locusPoint);
+			addToBgY = this._ball.y - this._gameBg2.y;
 		} 
+		console.log(this._lastLocusPointY + 'to' + (addToBgY+this._ballWH/2));
 
-		if(this._lastPointY > (this._stageH-5)) {
-			this._lastPointY = 0;
+		//跨背景图时特殊处理
+		if(this._lastLocusPointY > (this._stageH-this._locusW/2+this._ballWH/2)) {
+			this._lastLocusPointY = 0;
+			this._lastLocusPointX = this._moveToRight ? this._ball.x : (this._ball.x + this._ballWH);
 		}
 
+		//根据移动方向设置球的位置,触碰到边缘游戏结束
 		if(this._moveToRight == true) {
-			if(this._ball.x > (this._stageW-this._ball.width)) {
-				this._ball.x = this._stageW-this._ball.width;
-				this.gameOverTest();
+			if(this._ball.x > (this._stageW-this._ballWH)) {
+				this._ball.x = this._stageW-this._ballWH;
+				this.gameOverFunc();
 			} else {
 				this._ball.x += this._moveSepped*20;
 			}
 		} else {
 			if(this._ball.x < 0) {
 				this._ball.x = 0;
-				this.gameOverTest();
+				this.gameOverFunc();
 			} else {
 				this._ball.x -= this._moveSepped*20;
 			}
 		}
 	
-		locus.graphics.lineStyle(6,0xFF3030,1,true);
-		locus.graphics.moveTo(this._lastPointX, this._lastPointY);
-		locus.graphics.lineTo(this._ball.x + this._ball.width/2 , addY);
+		//上次保存的位置 到 现在球的位置画线
+		locusPoint.graphics.lineStyle(this._locusW,0xFF3030,1,true);
+		locusPoint.graphics.moveTo(this._lastLocusPointX, this._lastLocusPointY);
+		locusPoint.graphics.lineTo(this._ball.x + this._ballWH/2 , addToBgY+this._ballWH/2);
 
-		this._lastPointX = this._ball.x + this._ball.width/2;
-		this._lastPointY = addY;
+		//重新保存上次位置
+		this._lastLocusPointX = this._ball.x + this._ballWH/2;
+		this._lastLocusPointY = addToBgY+this._ballWH/2;
 	}
 
-	private gameOverTest() {
-		console.log("game over");
-		this.removeEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
-	}
-
+	//点击屏幕
 	private touchBegin(event: egret.TouchEvent) {
-
-		// //每次点击移除之前的动画
-		// egret.Tween.removeTweens(this._ball);
-
-		// let durationTime = 0;	//动画时间=距离/速度
-		// let durationToX = 0;	//要移动到屏幕左/右侧
-
-		// if(this._moveToRight == true) {
-		// 	durationToX = 0;
-		// 	durationTime = this._ball.x/this._moveSepped;
-		// } else {
-		// 	durationToX = this._stageW-this._ball.width;
-		// 	durationTime = (this._stageW - this._ball.width - this._ball.x)/this._moveSepped;
-		// }
-
-		// //开始移动动画
-		// egret.Tween.get(this._ball).to({x:durationToX}, durationTime);
-
 		//更改移动方向
 		this._moveToRight = !this._moveToRight;
 	}
 
-
-
-
-
-
 	//游戏结束
-	private gameTimerCompleteFunc () {
-
+	private gameOverFunc () {
+		console.log("game over");
 		this.stage.removeEventListener(egret.TouchEvent.TOUCH_BEGIN, this.touchBegin, this);
-
+		this.removeEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
 		if (this._backgroundChannel) this._backgroundChannel.stop();
-
+		// this.gameOver();
 	}
 
 	//接口-减游戏次数
