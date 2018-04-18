@@ -1,7 +1,7 @@
 {
 	"groups": [
 		{
-			"keys": "description_json,countdown_mp3,bg_mp3,guide_json,rocket_mp3,eat_mp3",
+			"keys": "description_json,countdown_mp3,bg_mp3,guide_json,rocket_mp3,eat_mp3,gamebody_json,guide2_json",
 			"name": "preload"
 		}
 	],
@@ -35,6 +35,17 @@
 			"url": "sound/eat.mp3",
 			"type": "sound",
 			"name": "eat_mp3"
+		},
+		{
+			"name": "gamebody_json",
+			"type": "sheet",
+			"url": "game/gamebody.json",
+			"subkeys": "start,tan,title,yun01,yun02,yun03,yun04,di,balloon,beibei,btn_03,btn_05,drawboard,ending,list,prompt_03,quicken,ranking,return"
+		},
+		{
+			"name": "guide2_json",
+			"type": "json",
+			"url": "game/guide.json"
 		}
 	]
 }

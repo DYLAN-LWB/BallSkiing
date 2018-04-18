@@ -99,22 +99,15 @@ class Games extends egret.DisplayObjectContainer {
 		let locus = new egret.Shape();
 		let addY = 0;
 		if(this._gameBg2.y > this._ball.y) {
-
 			addY = Math.abs(this._gameBg1.y) + this._ball.y;
 			this._gameBg1.addChild(locus);
-
 		} else if(this._gameBg2.y < this._ball.y && this._gameBg2.y > 0) {
-
 			addY = this._ball.y - this._gameBg2.y;
 			this._gameBg2.addChild(locus);
-
-		 }else if(this._gameBg1.y > this._ball.y) {
-
+		} else if(this._gameBg1.y > this._ball.y) {
 			addY = Math.abs(this._gameBg2.y) + this._ball.y;
 			this._gameBg2.addChild(locus);
-
 		} else if(this._gameBg1.y < this._ball.y && this._gameBg1.y > 0) {
-
 			addY = this._ball.y - this._gameBg1.y;
 			this._gameBg1.addChild(locus);
 		}
@@ -146,11 +139,9 @@ class Games extends egret.DisplayObjectContainer {
 	}
 
 	private gameOverTest() {
-				alert("game over");
-		this.addEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
-		// this.removeEventListener();
+		console.log("game over");
+		this.removeEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
 	}
-
 
 	private touchBegin(event: egret.TouchEvent) {
 

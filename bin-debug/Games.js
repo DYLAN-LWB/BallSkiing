@@ -1,13 +1,16 @@
 var __reflect = (this && this.__reflect) || function (p, c, t) {
     p.__class__ = c, t ? t.push(c) : t = [c], p.__types__ = p.__types__ ? t.concat(p.__types__) : t;
 };
-var __extends = this && this.__extends || function __extends(t, e) { 
- function r() { 
- this.constructor = t;
-}
-for (var i in e) e.hasOwnProperty(i) && (t[i] = e[i]);
-r.prototype = e.prototype, t.prototype = new r();
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var Games = (function (_super) {
     __extends(Games, _super);
     function Games() {
@@ -107,6 +110,7 @@ var Games = (function (_super) {
         if (this._moveToRight == true) {
             if (this._ball.x > (this._stageW - this._ball.width)) {
                 this._ball.x = this._stageW - this._ball.width;
+                this.gameOverTest();
             }
             else {
                 this._ball.x += this._moveSepped * 20;
@@ -115,11 +119,17 @@ var Games = (function (_super) {
         else {
             if (this._ball.x < 0) {
                 this._ball.x = 0;
+                this.gameOverTest();
             }
             else {
                 this._ball.x -= this._moveSepped * 20;
             }
         }
+    };
+    Games.prototype.gameOverTest = function () {
+        alert("game over");
+        this.addEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
+        // this.removeEventListener();
     };
     Games.prototype.touchBegin = function (event) {
         // //每次点击移除之前的动画

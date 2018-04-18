@@ -1,13 +1,16 @@
 var __reflect = (this && this.__reflect) || function (p, c, t) {
     p.__class__ = c, t ? t.push(c) : t = [c], p.__types__ = p.__types__ ? t.concat(p.__types__) : t;
 };
-var __extends = this && this.__extends || function __extends(t, e) { 
- function r() { 
- this.constructor = t;
-}
-for (var i in e) e.hasOwnProperty(i) && (t[i] = e[i]);
-r.prototype = e.prototype, t.prototype = new r();
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 //////////////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (c) 2014-present, Egret Technology.
@@ -937,7 +940,7 @@ var egret;
             for (var i = 0, l = tweens.length; i < l; i++) {
                 var tween_2 = tweens[i];
                 tween_2.paused = true;
-                tween_2._target.tween_count = 0;
+                tween_2._target.tweenjs_count = 0;
             }
             tweens.length = 0;
         };
@@ -1767,9 +1770,7 @@ var egret;
         var TweenItem = (function (_super) {
             __extends(TweenItem, _super);
             function TweenItem() {
-                var _this = _super.call(this) || this;
-                _this.isStop = false;
-                return _this;
+                return _super.call(this) || this;
             }
             Object.defineProperty(TweenItem.prototype, "props", {
                 /**
@@ -1839,30 +1840,26 @@ var egret;
             });
             /**
              * Play the Tween
-             * @position The starting position, the default is from the last position to play
+             * @time The starting position, the default is from the last position to play
              * @version Egret 3.1.8
              * @platform Web,Native
              * @language en_US
              */
             /**
              * 播放Tween
-             * @position 播放的起始位置, 默认为从上次位置继续播放
+             * @time 播放的起始位置, 默认为从上次位置继续播放
              * @version Egret 3.1.8
              * @platform Web,Native
              * @language zh_CN
              */
-            TweenItem.prototype.play = function (position) {
+            TweenItem.prototype.play = function (time) {
                 if (!this.tween) {
-                    this.createTween(position);
+                    this.createTween();
                 }
                 else {
                     this.tween.setPaused(false);
-                    if (this.isStop && position == undefined) {
-                        position = 0;
-                        this.isStop = false;
-                    }
-                    if (position !== undefined && position !== null) {
-                        this.tween.setPosition(position);
+                    if (time !== undefined && time !== null) {
+                        this.tween.setPosition(time);
                     }
                 }
             };
@@ -1897,15 +1894,12 @@ var egret;
              */
             TweenItem.prototype.stop = function () {
                 this.pause();
-                this.isStop = true;
+                this.tween = null;
             };
-            TweenItem.prototype.createTween = function (position) {
+            TweenItem.prototype.createTween = function () {
                 this.tween = egret.Tween.get(this._target, this._props);
                 if (this._paths) {
                     this.applyPaths();
-                }
-                if (position !== undefined && position !== null) {
-                    this.tween.setPosition(position);
                 }
             };
             TweenItem.prototype.applyPaths = function () {
