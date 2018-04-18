@@ -26,7 +26,8 @@ class Games extends egret.DisplayObjectContainer {
 	private _ball = new egret.Sprite;	//小球
 	private _ballWH = 30;	//小球宽高
 	private _moveToRight:boolean = true;	//小球是否在向右移动
-	private _moveSepped = 0.3;	//小球移动速度
+	private _ballMoveSpeed = 10;	//小球移动速度
+	private _bgMoveSpeed = 10;	//背景移动速度
 
 	private _locusW = 10;	//轨迹宽度
 
@@ -85,21 +86,21 @@ class Games extends egret.DisplayObjectContainer {
 		this.addChild(this._ball);
 
 		this._lastLocusPointX = this._stageW/2 + this._ballWH/2;
-		this._lastLocusPointY = 400;
+		this._lastLocusPointY = 400+ this._ballWH/2;
 	}
 
 	//实时监听
 	private frameObserve () {
-		this._gameBg1.y -= this._moveSepped*20;
-		this._gameBg2.y -= this._moveSepped*20;
+		this._gameBg1.y -= this._bgMoveSpeed;
+		this._gameBg2.y -= this._bgMoveSpeed;
 
 		//重新设置背景位置,清空子视图
-		if (this._gameBg1.y == -this._stageH) {
+		if (this._gameBg1.y <= -this._stageH) {
 			this._gameBg1.removeChildren();
 			this._gameBg1.y = this._stageH;
 		}
 
-		if (this._gameBg2.y == -this._stageH) {
+		if (this._gameBg2.y <= -this._stageH) {
 			this._gameBg2.removeChildren();
 			this._gameBg2.y = this._stageH;
 		}
@@ -108,21 +109,19 @@ class Games extends egret.DisplayObjectContainer {
 		let locusPoint = new egret.Shape();
 		//点相对于背景图的位置
 		let addToBgY = 0;
-
+		// let addToBgX = 0;
 		//判断添加到哪个背景
-		if (this._gameBg1.y > (-this._stageH+this._ball.y) && this._gameBg1.y <= 400) {
+		if (this._gameBg1.y > (-this._stageH+this._ball.y+this._bgMoveSpeed) && this._gameBg1.y <= (400+this._bgMoveSpeed)) {
 			this._gameBg1.addChild(locusPoint);
 			addToBgY = this._ball.y - this._gameBg1.y;
-		} else if (this._gameBg2.y > (-this._stageH+this._ball.y) && this._gameBg2.y <= 400){
+		} else if (this._gameBg2.y > (-this._stageH+this._ball.y+this._bgMoveSpeed) && this._gameBg2.y <= (400+this._bgMoveSpeed)){
 			this._gameBg2.addChild(locusPoint);
 			addToBgY = this._ball.y - this._gameBg2.y;
-		} 
-		console.log(this._lastLocusPointY + 'to' + (addToBgY+this._ballWH/2));
+		}
 
 		//跨背景图时特殊处理
-		if(this._lastLocusPointY > (this._stageH-this._locusW/2+this._ballWH/2)) {
+		if(this._lastLocusPointY > (this._stageH-this._bgMoveSpeed)) {
 			this._lastLocusPointY = 0;
-			this._lastLocusPointX = this._moveToRight ? this._ball.x : (this._ball.x + this._ballWH);
 		}
 
 		//根据移动方向设置球的位置,触碰到边缘游戏结束
@@ -131,14 +130,14 @@ class Games extends egret.DisplayObjectContainer {
 				this._ball.x = this._stageW-this._ballWH;
 				this.gameOverFunc();
 			} else {
-				this._ball.x += this._moveSepped*20;
+				this._ball.x += this._ballMoveSpeed;
 			}
 		} else {
 			if(this._ball.x < 0) {
 				this._ball.x = 0;
 				this.gameOverFunc();
 			} else {
-				this._ball.x -= this._moveSepped*20;
+				this._ball.x -= this._ballMoveSpeed;
 			}
 		}
 	
@@ -154,9 +153,36 @@ class Games extends egret.DisplayObjectContainer {
 
 	//点击屏幕
 	private touchBegin(event: egret.TouchEvent) {
-		//更改移动方向
-		this._moveToRight = !this._moveToRight;
+
+
+		var bufferTimer: egret.Timer = new egret.Timer(10, 20);
+        bufferTimer.addEventListener(egret.TimerEvent.TIMER, this.bufferTimerFunc, this);
+        bufferTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, this.bufferTimerComFunc, this);
+        bufferTimer.start();
+
+
+
 	}
+
+ 	private bufferTimerFunc(event:egret.TimerEvent) {
+		this._ballMoveSpeed -= 0.5;
+    }
+
+    private bufferTimerComFunc(event: egret.TimerEvent) {
+
+				//更改移动方向
+		this._moveToRight = !this._moveToRight;
+
+        this._ballMoveSpeed = 0;
+		var timer: egret.Timer = new egret.Timer(10, 20);
+        timer.addEventListener(egret.TimerEvent.TIMER, this.timerFunc, this);
+        timer.start();
+    }
+
+
+	private timerFunc(event:egret.TimerEvent) {
+        this._ballMoveSpeed += 0.5;
+    }
 
 	//游戏结束
 	private gameOverFunc () {
