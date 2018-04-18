@@ -46,7 +46,7 @@ var Home = (function (_super) {
         //获取用户相关信息
         this.getUserInfo();
         //首页显示广告
-        this.addChild(new Advert(this.stage.stageWidth, this.stage.stageHeight, this._isPortraitScreen));
+        // this.addChild(new Advert(this.stage.stageWidth, this.stage.stageHeight, this._isPortraitScreen));
     };
     Home.prototype.getUserInfo = function () {
         //test app url
@@ -212,7 +212,6 @@ var Home = (function (_super) {
             }
         }
         else {
-            $("#guangao").hide();
             this.removeChildren();
             this.addChild(new Games());
         }
@@ -229,7 +228,6 @@ var Home = (function (_super) {
             console.log(result);
             if (result["code"] == 0) {
                 if (this._playCount > 0) {
-                    $("#guangao").hide();
                     this.removeChildren();
                     this.addChild(new Games());
                 }

@@ -35,17 +35,14 @@
 
     <!--这个标签会被替换为项目中所有的 javascript 文件。删除 game_files 标签后，项目文件加载列表将不会变化，请谨慎操作！-->
     <!--game_files_start-->
+	<script egret="lib" src="bin-debug/Games.js"></script>
 	<script egret="lib" src="bin-debug/Home.js"></script>
-	<script egret="lib" src="bin-debug/Public/Alert.js"></script>
 	<script egret="lib" src="bin-debug/LoadingUI.js"></script>
 	<script egret="lib" src="bin-debug/Main.js"></script>
-	<script egret="lib" src="bin-debug/Public/Advert.js"></script>
-	<script egret="lib" src="bin-debug/Games.js"></script>
+	<script egret="lib" src="bin-debug/Public/Alert.js"></script>
 	<script egret="lib" src="bin-debug/Public/AlertEvent.js"></script>
 	<script egret="lib" src="bin-debug/Public/Bitmap.js"></script>
-	<script egret="lib" src="bin-debug/Public/GameUtil.js"></script>
 	<script egret="lib" src="bin-debug/Public/Info.js"></script>
-	<script egret="lib" src="bin-debug/Public/Movie.js"></script>
 	<!--game_files_end-->
 
     <script type="text/javascript" src="resource/js/jquery-2.1.1.min.js"></script>
@@ -58,9 +55,6 @@
     <div id = "attention" onclick="clickAttention();" style="display: none; z-index: 9999; position: absolute;">
         <img style="width: 100%; height: 100%;" src="resource/game/attention.png"/>
     </div>
-
-    <!--赋值淘口令使用-->
-    <input id="code" readOnly="true" style="outline: none;border: 0px; color: rgba(0,0,0,0.0);position: absolute;left:-200px; background-color: transparent"  value=""/>
 
     <div style="margin: auto;width: 100%;height: 100%;" class="egret-player"
          data-entry-class="Main"
@@ -87,24 +81,6 @@
          //点击关注二维码移除
         function clickAttention() {
             document.getElementById("attention").style.display = "none";
-        }
-
-        //复制到剪贴板
-        function copyCode() {
-
-            if (navigator.userAgent.match(/(iPhone|iPod|iPad);?/i)) {
-                window.getSelection().removeAllRanges();
-                var code = document.getElementById("code");	//要复制文字的节点
-                var range = document.createRange();	//选中需要复制的节点
-                range.selectNode(code);	//执行选中元素
-                window.getSelection().addRange(range);
-                var successful = document.execCommand('copy');	//执行 copy 操作
-                window.getSelection().removeAllRanges();	//移除选中的元素
-            } else {
-                var code = document.getElementById("code"); //要复制文字的节点
-                code.select(); //选择对象
-                document.execCommand("Copy"); //执行浏览器复制命令
-            }
         }
     </script>
 

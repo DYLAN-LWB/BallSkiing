@@ -8,17 +8,14 @@ var game_file_list = [
 	"libs/modules/res/res.js",
 	"libs/modules/tween/tween.js",
 	"promise/promise.js",
+	"bin-debug/Games.js",
 	"bin-debug/Home.js",
-	"bin-debug/Public/Alert.js",
 	"bin-debug/LoadingUI.js",
 	"bin-debug/Main.js",
-	"bin-debug/Public/Advert.js",
-	"bin-debug/Games.js",
+	"bin-debug/Public/Alert.js",
 	"bin-debug/Public/AlertEvent.js",
 	"bin-debug/Public/Bitmap.js",
-	"bin-debug/Public/GameUtil.js",
 	"bin-debug/Public/Info.js",
-	"bin-debug/Public/Movie.js",
 	//----auto game_file_list end----
 ];
 

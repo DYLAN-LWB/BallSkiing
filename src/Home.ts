@@ -46,7 +46,7 @@ class Home extends egret.DisplayObjectContainer {
         this.getUserInfo();
         
         //首页显示广告
-        this.addChild(new Advert(this.stage.stageWidth, this.stage.stageHeight, this._isPortraitScreen));
+        // this.addChild(new Advert(this.stage.stageWidth, this.stage.stageHeight, this._isPortraitScreen));
     }
      public getUserInfo() {
 
@@ -233,7 +233,6 @@ class Home extends egret.DisplayObjectContainer {
                 this.checkIsAttention();
             }
         } else { //app直接进入游戏页面
-            $("#guangao").hide();
             this.removeChildren();
             this.addChild(new Games());
         }
@@ -252,7 +251,6 @@ class Home extends egret.DisplayObjectContainer {
             console.log(result);
             if (result["code"] == 0) { //已关注
                 if (this._playCount > 0) { //已关注并且有游戏次数 进入游戏页面
-                    $("#guangao").hide();
                     this.removeChildren();
                     this.addChild(new Games());
                 } 
