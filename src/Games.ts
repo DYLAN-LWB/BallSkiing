@@ -24,7 +24,7 @@ class Games extends egret.DisplayObjectContainer {
 	private _bgMoveSpeed = 10;	//背景移动速度
 	private _baseSpeed = 1;		//速度系数,加速时增加
 
-	private _locusW = 8;	//轨迹宽度
+	private _locusW = 8;	//初始轨迹宽度
 	private _lastLocusPointX;	//上个轨迹点的x坐标
 	private _lastLocusPointY;	//上个轨迹点的y坐标
 	private _locusPointAaray = [];	//轨迹点数组
@@ -65,6 +65,8 @@ class Games extends egret.DisplayObjectContainer {
         this._gameBg1.graphics.drawRect(0, 0, this._gameBg1.width, this._gameBg1.height);
         this._gameBg1.graphics.endFill();
         this.addChild(this._gameBg1);
+		this.addBarriers(this._gameBg1);
+
 		//添加背景2
 		this._gameBg2 = new egret.Sprite();
 		this._gameBg2.x = 0;
@@ -75,7 +77,7 @@ class Games extends egret.DisplayObjectContainer {
         this._gameBg2.graphics.drawRect(0, 0, this._gameBg2.width, this._gameBg2.height);
         this._gameBg2.graphics.endFill();
         this.addChild(this._gameBg2);
-		//添加障碍物
+		this.addBarriers(this._gameBg2);
 
 		//添加小球
 		this._ball.x = this._stageW/2;
@@ -88,9 +90,43 @@ class Games extends egret.DisplayObjectContainer {
 		this._lastLocusPointY = 400+ this._ball.height/2;
 	}
 
-	private addBarriers() {
+	private addBarriers(bgView) {
 
-		this._barrierArray.push();
+		for(var i = 0; i < (10+Math.random()*10); i++) {
+			//高分区
+			let scoreBg = new egret.Sprite;
+			scoreBg.x = Math.random()*(this._stageW-80);
+			scoreBg.y = Math.random()*(this._stageH-80);
+			scoreBg.width = 80;
+			scoreBg.height = 80;
+			scoreBg.graphics.beginFill(0x53868B,0.2);
+			scoreBg.graphics.drawCircle(40, 40, 40);
+			scoreBg.graphics.endFill();
+			bgView.addChild(scoreBg);
+
+			//障碍物背景,炸弹
+			let barrierBg = new egret.Sprite;
+			barrierBg.x = 20;
+			barrierBg.y = 20;
+			barrierBg.width = 40;
+			barrierBg.height = 40;
+			barrierBg.graphics.beginFill(0xFF0000,0.2);
+			barrierBg.graphics.drawCircle(20, 20, 20);
+			barrierBg.graphics.endFill();
+			scoreBg.addChild(barrierBg);
+
+			//障碍物
+			let barrier  = new Bitmap("monster_png");
+			barrier.x = 5;
+			barrier.y = 5;
+			barrier.width = 30;
+			barrier.height = 30;
+			barrierBg.addChild(barrier);
+
+			// this._barrierArray.push(barrierBg);
+
+		}
+
 	}
 
 	//实时监听
@@ -103,12 +139,14 @@ class Games extends egret.DisplayObjectContainer {
 			this._gameBg1.removeChildren();
 			this._gameBg1.y = this._gameBg2.y + this._stageH;
 			this._locusPointAaray.splice(0, this._locusPointAaray.length);
+			this.addBarriers(this._gameBg1);
 		}
 
 		if (this._gameBg2.y <= -this._stageH) {
 			this._gameBg2.removeChildren();
 			this._gameBg2.y = this._gameBg1.y  + this._stageH;
 			this._locusPointAaray.splice(0, this._locusPointAaray.length);
+			this.addBarriers(this._gameBg2);
 		}
 
 		

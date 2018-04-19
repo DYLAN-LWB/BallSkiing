@@ -56,6 +56,7 @@ var Games = (function (_super) {
         this._gameBg1.graphics.drawRect(0, 0, this._gameBg1.width, this._gameBg1.height);
         this._gameBg1.graphics.endFill();
         this.addChild(this._gameBg1);
+        this.addBarriers(this._gameBg1);
         //添加背景2
         this._gameBg2 = new egret.Sprite();
         this._gameBg2.x = 0;
@@ -66,7 +67,7 @@ var Games = (function (_super) {
         this._gameBg2.graphics.drawRect(0, 0, this._gameBg2.width, this._gameBg2.height);
         this._gameBg2.graphics.endFill();
         this.addChild(this._gameBg2);
-        //添加障碍物
+        this.addBarriers(this._gameBg2);
         //添加小球
         this._ball.x = this._stageW / 2;
         this._ball.y = 400;
@@ -76,8 +77,37 @@ var Games = (function (_super) {
         this._lastLocusPointX = this._stageW / 2 + this._ball.width / 2;
         this._lastLocusPointY = 400 + this._ball.height / 2;
     };
-    Games.prototype.addBarriers = function () {
-        this._barrierArray.push();
+    Games.prototype.addBarriers = function (bgView) {
+        for (var i = 0; i < (10 + Math.random() * 10); i++) {
+            //高分区
+            var scoreBg = new egret.Sprite;
+            scoreBg.x = Math.random() * (this._stageW - 80);
+            scoreBg.y = Math.random() * (this._stageH - 80);
+            scoreBg.width = 80;
+            scoreBg.height = 80;
+            scoreBg.graphics.beginFill(0x53868B, 0.2);
+            scoreBg.graphics.drawCircle(40, 40, 40);
+            scoreBg.graphics.endFill();
+            bgView.addChild(scoreBg);
+            //障碍物背景,炸弹
+            var barrierBg = new egret.Sprite;
+            barrierBg.x = 20;
+            barrierBg.y = 20;
+            barrierBg.width = 40;
+            barrierBg.height = 40;
+            barrierBg.graphics.beginFill(0xFF0000, 0.2);
+            barrierBg.graphics.drawCircle(20, 20, 20);
+            barrierBg.graphics.endFill();
+            scoreBg.addChild(barrierBg);
+            //障碍物
+            var barrier = new Bitmap("monster_png");
+            barrier.x = 5;
+            barrier.y = 5;
+            barrier.width = 30;
+            barrier.height = 30;
+            barrierBg.addChild(barrier);
+            // this._barrierArray.push(barrierBg);
+        }
     };
     //实时监听
     Games.prototype.frameObserve = function () {
@@ -88,11 +118,13 @@ var Games = (function (_super) {
             this._gameBg1.removeChildren();
             this._gameBg1.y = this._gameBg2.y + this._stageH;
             this._locusPointAaray.splice(0, this._locusPointAaray.length);
+            this.addBarriers(this._gameBg1);
         }
         if (this._gameBg2.y <= -this._stageH) {
             this._gameBg2.removeChildren();
             this._gameBg2.y = this._gameBg1.y + this._stageH;
             this._locusPointAaray.splice(0, this._locusPointAaray.length);
+            this.addBarriers(this._gameBg2);
         }
         var locusPoint = new egret.Shape(); //轨迹点
         var addToBgY = 0; //点相对于背景图的Y值
