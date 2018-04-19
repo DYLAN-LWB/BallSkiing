@@ -20,12 +20,16 @@ var Games = (function (_super) {
         _this._score = 0; //游戏分数
         _this._ball = new Bitmap("person_png"); //小球
         _this._moveToRight = true; //小球是否在向右移动
-        _this._ballMoveSpeed = 10; //小球移动速度
+        _this._ballMoveSpeed = 8; //小球移动速度
         _this._bgMoveSpeed = 10; //背景移动速度
         _this._baseSpeed = 1; //速度系数,加速时增加
-        _this._locusW = 8; //轨迹宽度
+        _this._isSpeedUp = false; //是否加速
+        _this._locusW = 8; //初始轨迹宽度
         _this._locusPointAaray = []; //轨迹点数组
-        _this._barrierArray = []; //障碍物数组
+        _this._highScoreArray1 = []; //高分区数组
+        _this._barrierArray1 = []; //障碍物数组
+        _this._highScoreArray2 = []; //高分区数组
+        _this._barrierArray2 = []; //障碍物数组
         _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.createGameScene, _this);
         return _this;
     }
@@ -52,32 +56,40 @@ var Games = (function (_super) {
         this._gameBg1.y = 0;
         this._gameBg1.width = this._stageW;
         this._gameBg1.height = this._stageH;
-        this._gameBg1.graphics.beginFill(0xFFFAF0);
+        this._gameBg1.graphics.beginFill(0xFEFEFE);
         this._gameBg1.graphics.drawRect(0, 0, this._gameBg1.width, this._gameBg1.height);
         this._gameBg1.graphics.endFill();
         this.addChild(this._gameBg1);
-        this.addBarriers(this._gameBg1);
+        this.addBarriers(1);
         //添加背景2
         this._gameBg2 = new egret.Sprite();
         this._gameBg2.x = 0;
         this._gameBg2.y = this._stageH;
         this._gameBg2.width = this._stageW;
         this._gameBg2.height = this._stageH;
-        this._gameBg2.graphics.beginFill(0xFFFAF0);
+        this._gameBg2.graphics.beginFill(0xFEFEFE);
         this._gameBg2.graphics.drawRect(0, 0, this._gameBg2.width, this._gameBg2.height);
         this._gameBg2.graphics.endFill();
         this.addChild(this._gameBg2);
-        this.addBarriers(this._gameBg2);
+        this.addBarriers(2);
         //添加小球
         this._ball.x = this._stageW / 2;
         this._ball.y = 400;
-        this._ball.width = 30;
-        this._ball.height = 30;
+        this._ball.width = 40;
+        this._ball.height = 40;
         this.addChild(this._ball);
         this._lastLocusPointX = this._stageW / 2 + this._ball.width / 2;
         this._lastLocusPointY = 400 + this._ball.height / 2;
     };
-    Games.prototype.addBarriers = function (bgView) {
+    Games.prototype.addBarriers = function (page) {
+        if (page == 1) {
+            this._highScoreArray1.splice(0, this._highScoreArray1.length);
+            this._barrierArray1.splice(0, this._barrierArray1.length);
+        }
+        else {
+            this._highScoreArray2.splice(0, this._highScoreArray2.length);
+            this._barrierArray2.splice(0, this._barrierArray2.length);
+        }
         for (var i = 0; i < (10 + Math.random() * 10); i++) {
             //高分区
             var scoreBg = new egret.Sprite;
@@ -85,20 +97,18 @@ var Games = (function (_super) {
             scoreBg.y = Math.random() * (this._stageH - 80);
             scoreBg.width = 80;
             scoreBg.height = 80;
-            scoreBg.graphics.beginFill(0x53868B, 0.2);
+            scoreBg.graphics.beginFill(0x53868B, 0.01);
             scoreBg.graphics.drawCircle(40, 40, 40);
             scoreBg.graphics.endFill();
-            bgView.addChild(scoreBg);
-            //障碍物背景,炸弹
+            //障碍物背景,爆炸
             var barrierBg = new egret.Sprite;
-            barrierBg.x = 20;
-            barrierBg.y = 20;
+            barrierBg.x = scoreBg.x + 20;
+            barrierBg.y = scoreBg.y + 20;
             barrierBg.width = 40;
             barrierBg.height = 40;
-            barrierBg.graphics.beginFill(0xFF0000, 0.2);
+            barrierBg.graphics.beginFill(0xFF0000, 0.01);
             barrierBg.graphics.drawCircle(20, 20, 20);
             barrierBg.graphics.endFill();
-            scoreBg.addChild(barrierBg);
             //障碍物
             var barrier = new Bitmap("monster_png");
             barrier.x = 5;
@@ -106,7 +116,18 @@ var Games = (function (_super) {
             barrier.width = 30;
             barrier.height = 30;
             barrierBg.addChild(barrier);
-            // this._barrierArray.push(barrierBg);
+            if (page == 1) {
+                this._gameBg1.addChild(scoreBg);
+                this._gameBg1.addChild(barrierBg);
+                this._highScoreArray1.push(scoreBg);
+                this._barrierArray1.push(barrierBg);
+            }
+            else {
+                this._gameBg2.addChild(scoreBg);
+                this._gameBg2.addChild(barrierBg);
+                this._highScoreArray2.push(scoreBg);
+                this._barrierArray2.push(barrierBg);
+            }
         }
     };
     //实时监听
@@ -118,13 +139,13 @@ var Games = (function (_super) {
             this._gameBg1.removeChildren();
             this._gameBg1.y = this._gameBg2.y + this._stageH;
             this._locusPointAaray.splice(0, this._locusPointAaray.length);
-            this.addBarriers(this._gameBg1);
+            this.addBarriers(1);
         }
         if (this._gameBg2.y <= -this._stageH) {
             this._gameBg2.removeChildren();
             this._gameBg2.y = this._gameBg1.y + this._stageH;
             this._locusPointAaray.splice(0, this._locusPointAaray.length);
-            this.addBarriers(this._gameBg2);
+            this.addBarriers(2);
         }
         var locusPoint = new egret.Shape(); //轨迹点
         var addToBgY = 0; //点相对于背景图的Y值
@@ -138,10 +159,10 @@ var Games = (function (_super) {
             addToBgY = this._ball.y - this._gameBg2.y;
         }
         //跨背景图时特殊处理
-        console.log("line from=" + this._lastLocusPointY + "----to" + (addToBgY + this._ball.height / 2));
+        // console.log("line from=" + this._lastLocusPointY + "----to" + (addToBgY + this._ball.height/2));
         if (this._lastLocusPointY > (this._stageH - this._bgMoveSpeed * this._baseSpeed)) {
             this._lastLocusPointY = (addToBgY + this._ball.height / 2) - this._bgMoveSpeed * this._baseSpeed;
-            console.log("!!!!!!!change from=" + this._lastLocusPointY + "----to" + (addToBgY + this._ball.height / 2));
+            // console.log("!!!!!!!change from=" + this._lastLocusPointY + "----to" + (addToBgY + this._ball.height/2));
         }
         //根据移动方向设置球的位置,触碰到边缘游戏结束
         if (this._moveToRight == true) {
@@ -150,7 +171,7 @@ var Games = (function (_super) {
                 this.gameOverFunc();
             }
             else {
-                this._ball.x += this._ballMoveSpeed * this._baseSpeed;
+                this._ball.x += this._ballMoveSpeed;
             }
         }
         else {
@@ -159,7 +180,7 @@ var Games = (function (_super) {
                 this.gameOverFunc();
             }
             else {
-                this._ball.x -= this._ballMoveSpeed * this._baseSpeed;
+                this._ball.x -= this._ballMoveSpeed;
             }
         }
         //保存对象,起点,终点
@@ -175,21 +196,23 @@ var Games = (function (_super) {
         this._locusPointAaray.reverse();
         for (var i = 0; i < this._locusPointAaray.length; i++) {
             var maxWidth = this._locusW * 0.05 * i;
-            if (maxWidth > this._locusW * 3) {
-                maxWidth = this._locusW * 3;
+            if (maxWidth > this._locusW * 4) {
+                maxWidth = this._locusW * 4;
             }
             if (maxWidth < this._locusW) {
                 maxWidth = this._locusW;
             }
             var point = this._locusPointAaray[i]["object"];
-            point.graphics.clear();
-            point.graphics.lineStyle(maxWidth, 0x00C5CD, 1, true);
+            point.graphics.lineStyle(maxWidth, this._isSpeedUp ? 0xAEEEEE : 0xAEEEEE, 1, true);
             point.graphics.moveTo(this._locusPointAaray[i]["beginX"], this._locusPointAaray[i]["beginY"]);
             point.graphics.lineTo(this._locusPointAaray[i]["endX"], this._locusPointAaray[i]["endY"]);
         }
         //重新保存上次位置
         this._lastLocusPointX = this._ball.x + this._ball.width / 2;
         this._lastLocusPointY = addToBgY + this._ball.height / 2;
+        //碰撞检测
+        this.checkBarrierHit();
+        this.checkHighScoreHit();
     };
     //点击屏幕
     Games.prototype.touchBegin = function (event) {
@@ -200,7 +223,10 @@ var Games = (function (_super) {
     };
     //减速
     Games.prototype.bufferTimerFunc = function (event) {
-        this._ballMoveSpeed -= 0.5 * this._baseSpeed;
+        this._ballMoveSpeed -= 0.5;
+        if (this._ballMoveSpeed < 0) {
+            this._ballMoveSpeed = 0;
+        }
     };
     //减速结束-转向-加速
     Games.prototype.bufferTimerComFunc = function (event) {
@@ -213,11 +239,64 @@ var Games = (function (_super) {
     };
     //加速
     Games.prototype.timerFunc = function (event) {
-        this._ballMoveSpeed += 0.5 * this._baseSpeed;
+        this._ballMoveSpeed += 0.5;
+        if (this._ballMoveSpeed > 15) {
+            this._ballMoveSpeed = 15;
+        }
+    };
+    Games.prototype.checkHighScoreHit = function () {
+        for (var index = 0; index < this._highScoreArray1.length; index++) {
+            var bar = this._highScoreArray1[index];
+            var _isHit = bar.hitTestPoint(this._ball.x + this._ball.width / 2, this._ball.y + this._ball.height);
+            if (_isHit) {
+                console.log("加速");
+                this._isSpeedUp = true;
+                this._baseSpeed = 1.5;
+                var bufferTimer = new egret.Timer(5000, 1);
+                bufferTimer.addEventListener(egret.TimerEvent.TIMER, function () {
+                    this._isSpeedUp = false;
+                    this._baseSpeed = 1;
+                }, this);
+                bufferTimer.start();
+            }
+        }
+        for (var index = 0; index < this._highScoreArray2.length; index++) {
+            var bar = this._highScoreArray2[index];
+            var _isHit = bar.hitTestPoint(this._ball.x + this._ball.width / 2, this._ball.y + this._ball.height);
+            if (_isHit) {
+                console.log("加速");
+                this._isSpeedUp = true;
+                this._baseSpeed = 1.5;
+                var bufferTimer = new egret.Timer(5000, 1);
+                bufferTimer.addEventListener(egret.TimerEvent.TIMER, function () {
+                    this._isSpeedUp = false;
+                    this._baseSpeed = 1;
+                }, this);
+                bufferTimer.start();
+            }
+        }
+    };
+    Games.prototype.checkBarrierHit = function () {
+        for (var index = 0; index < this._barrierArray1.length; index++) {
+            var bar = this._barrierArray1[index];
+            var _isHit = bar.hitTestPoint(this._ball.x + this._ball.width / 2, this._ball.y + this._ball.height);
+            if (_isHit) {
+                // this.gameOverFunc();
+                console.log("死了");
+            }
+        }
+        for (var index = 0; index < this._barrierArray2.length; index++) {
+            var bar = this._barrierArray2[index];
+            var _isHit = bar.hitTestPoint(this._ball.x + this._ball.width / 2, this._ball.y + this._ball.height);
+            if (_isHit) {
+                // this.gameOverFunc();
+                console.log("死了");
+            }
+        }
     };
     //游戏结束
     Games.prototype.gameOverFunc = function () {
-        console.log("game over");
+        // alert("game over");
         this.stage.removeEventListener(egret.TouchEvent.TOUCH_BEGIN, this.touchBegin, this);
         this.removeEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
         if (this._backgroundChannel)
