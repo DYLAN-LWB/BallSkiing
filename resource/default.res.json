@@ -1,7 +1,7 @@
 {
 	"groups": [
 		{
-			"keys": "description_json,countdown_mp3,bg_mp3,guide_json,rocket_mp3,eat_mp3,gamebody_json,guide2_json",
+			"keys": "description_json,countdown_mp3,bg_mp3,rocket_mp3,eat_mp3,person_png,monster_png",
 			"name": "preload"
 		}
 	],
@@ -22,11 +22,6 @@
 			"name": "bg_mp3"
 		},
 		{
-			"url": "game/guide.json",
-			"type": "json",
-			"name": "guide_json"
-		},
-		{
 			"url": "sound/rocket.mp3",
 			"type": "sound",
 			"name": "rocket_mp3"
@@ -37,15 +32,14 @@
 			"name": "eat_mp3"
 		},
 		{
-			"name": "gamebody_json",
-			"type": "sheet",
-			"url": "game/gamebody.json",
-			"subkeys": "start,tan,title,yun01,yun02,yun03,yun04,di,balloon,beibei,btn_03,btn_05,drawboard,ending,list,prompt_03,quicken,ranking,return"
+			"name": "person_png",
+			"type": "image",
+			"url": "http://beisu-js.oss-cn-beijing.aliyuncs.com/game/ball/person.png"
 		},
 		{
-			"name": "guide2_json",
-			"type": "json",
-			"url": "game/guide.json"
+			"name": "monster_png",
+			"type": "image",
+			"url": "http://beisu-js.oss-cn-beijing.aliyuncs.com/game/ball/monster.png"
 		}
 	]
 }
