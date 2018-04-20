@@ -1,0 +1,55 @@
+{
+	"groups": [
+		{
+			"keys": "description_json,countdown_mp3,bg_mp3,rocket_mp3,eat_mp3,person_png,monster_png,guide_png,guide_json",
+			"name": "preload"
+		}
+	],
+	"resources": [
+		{
+			"url": "config/description.json",
+			"type": "json",
+			"name": "description_json"
+		},
+		{
+			"url": "sound/countdown.mp3",
+			"type": "sound",
+			"name": "countdown_mp3"
+		},
+		{
+			"url": "sound/bg.mp3",
+			"type": "sound",
+			"name": "bg_mp3"
+		},
+		{
+			"url": "sound/rocket.mp3",
+			"type": "sound",
+			"name": "rocket_mp3"
+		},
+		{
+			"url": "sound/eat.mp3",
+			"type": "sound",
+			"name": "eat_mp3"
+		},
+		{
+			"name": "person_png",
+			"type": "image",
+			"url": "http://beisu-js.oss-cn-beijing.aliyuncs.com/game/ball/person.png"
+		},
+		{
+			"name": "monster_png",
+			"type": "image",
+			"url": "http://beisu-js.oss-cn-beijing.aliyuncs.com/game/ball/monster.png"
+		},
+		{
+			"name": "guide_png",
+			"type": "image",
+			"url": "http://beisuapp.oss-cn-beijing.aliyuncs.com/uploads/game/1101/guide.png"
+		},
+		{
+			"name": "guide_json",
+			"type": "json",
+			"url": "game/guide.json"
+		}
+	]
+}
