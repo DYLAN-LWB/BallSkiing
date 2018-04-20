@@ -50,22 +50,29 @@ class Games extends egret.DisplayObjectContainer {
 	private setupViews() {
 
 		//背景音乐
-		let sound = new egret.Sound();
-		sound.addEventListener(egret.Event.COMPLETE, function() {
-			this._backgroundChannel = sound.play(0,0);
-			this._backgroundChannel.volume = 0.8;
-		}, this);
-		sound.load("resource/sound/bg.mp3");
+		// let sound = new egret.Sound();
+		// sound.addEventListener(egret.Event.COMPLETE, function() {
+		// 	this._backgroundChannel = sound.play(0,0);
+		// 	this._backgroundChannel.volume = 0.8;
+		// }, this);
+		// sound.load("resource/sound/bg.mp3");
 
+		//添加小球
+		this._ball.x = this._stageW/2;
+		this._ball.y = 400;
+		this._ball.width = 40;
+		this._ball.height = 40;
+		this.addChild(this._ball);
+		
 		//添加背景1
 		this._gameBg1 = new egret.Sprite();
 		this._gameBg1.x = 0;
 		this._gameBg1.y = 0;
 		this._gameBg1.width = this._stageW;
 		this._gameBg1.height = this._stageH;
-		this._gameBg1.graphics.beginFill(0xFEFEFE);
-        this._gameBg1.graphics.drawRect(0, 0, this._gameBg1.width, this._gameBg1.height);
-        this._gameBg1.graphics.endFill();
+		// this._gameBg1.graphics.beginFill(0xFEFEFE);
+        // this._gameBg1.graphics.drawRect(0, 0, this._gameBg1.width, this._gameBg1.height);
+        // this._gameBg1.graphics.endFill();
         this.addChild(this._gameBg1);
 		this.addBarriers(1);
 
@@ -75,18 +82,11 @@ class Games extends egret.DisplayObjectContainer {
 		this._gameBg2.y = this._stageH;
 		this._gameBg2.width = this._stageW;
 		this._gameBg2.height = this._stageH;
-		this._gameBg2.graphics.beginFill(0xFEFEFE);
-        this._gameBg2.graphics.drawRect(0, 0, this._gameBg2.width, this._gameBg2.height);
-        this._gameBg2.graphics.endFill();
+		// this._gameBg2.graphics.beginFill(0xFEFEFE);
+        // this._gameBg2.graphics.drawRect(0, 0, this._gameBg2.width, this._gameBg2.height);
+        // this._gameBg2.graphics.endFill();
         this.addChild(this._gameBg2);
 		this.addBarriers(2);
-
-		//添加小球
-		this._ball.x = this._stageW/2;
-		this._ball.y = 400;
-		this._ball.width = 40;
-		this._ball.height = 40;
-		this.addChild(this._ball);
 
 		this._lastLocusPointX = this._stageW/2 + this._ball.width/2;
 		this._lastLocusPointY = 400+ this._ball.height/2;

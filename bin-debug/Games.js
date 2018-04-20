@@ -44,21 +44,27 @@ var Games = (function (_super) {
     };
     Games.prototype.setupViews = function () {
         //背景音乐
-        var sound = new egret.Sound();
-        sound.addEventListener(egret.Event.COMPLETE, function () {
-            this._backgroundChannel = sound.play(0, 0);
-            this._backgroundChannel.volume = 0.8;
-        }, this);
-        sound.load("resource/sound/bg.mp3");
+        // let sound = new egret.Sound();
+        // sound.addEventListener(egret.Event.COMPLETE, function() {
+        // 	this._backgroundChannel = sound.play(0,0);
+        // 	this._backgroundChannel.volume = 0.8;
+        // }, this);
+        // sound.load("resource/sound/bg.mp3");
+        //添加小球
+        this._ball.x = this._stageW / 2;
+        this._ball.y = 400;
+        this._ball.width = 40;
+        this._ball.height = 40;
+        this.addChild(this._ball);
         //添加背景1
         this._gameBg1 = new egret.Sprite();
         this._gameBg1.x = 0;
         this._gameBg1.y = 0;
         this._gameBg1.width = this._stageW;
         this._gameBg1.height = this._stageH;
-        this._gameBg1.graphics.beginFill(0xFEFEFE);
-        this._gameBg1.graphics.drawRect(0, 0, this._gameBg1.width, this._gameBg1.height);
-        this._gameBg1.graphics.endFill();
+        // this._gameBg1.graphics.beginFill(0xFEFEFE);
+        // this._gameBg1.graphics.drawRect(0, 0, this._gameBg1.width, this._gameBg1.height);
+        // this._gameBg1.graphics.endFill();
         this.addChild(this._gameBg1);
         this.addBarriers(1);
         //添加背景2
@@ -67,17 +73,11 @@ var Games = (function (_super) {
         this._gameBg2.y = this._stageH;
         this._gameBg2.width = this._stageW;
         this._gameBg2.height = this._stageH;
-        this._gameBg2.graphics.beginFill(0xFEFEFE);
-        this._gameBg2.graphics.drawRect(0, 0, this._gameBg2.width, this._gameBg2.height);
-        this._gameBg2.graphics.endFill();
+        // this._gameBg2.graphics.beginFill(0xFEFEFE);
+        // this._gameBg2.graphics.drawRect(0, 0, this._gameBg2.width, this._gameBg2.height);
+        // this._gameBg2.graphics.endFill();
         this.addChild(this._gameBg2);
         this.addBarriers(2);
-        //添加小球
-        this._ball.x = this._stageW / 2;
-        this._ball.y = 400;
-        this._ball.width = 40;
-        this._ball.height = 40;
-        this.addChild(this._ball);
         this._lastLocusPointX = this._stageW / 2 + this._ball.width / 2;
         this._lastLocusPointY = 400 + this._ball.height / 2;
     };
@@ -251,7 +251,7 @@ var Games = (function (_super) {
             if (_isHit) {
                 console.log("加速");
                 this._isSpeedUp = true;
-                this._baseSpeed = 1.5;
+                // this._baseSpeed = 1.5;
                 var bufferTimer = new egret.Timer(5000, 1);
                 bufferTimer.addEventListener(egret.TimerEvent.TIMER, function () {
                     this._isSpeedUp = false;
@@ -266,7 +266,7 @@ var Games = (function (_super) {
             if (_isHit) {
                 console.log("加速");
                 this._isSpeedUp = true;
-                this._baseSpeed = 1.5;
+                // this._baseSpeed = 1.5;
                 var bufferTimer = new egret.Timer(5000, 1);
                 bufferTimer.addEventListener(egret.TimerEvent.TIMER, function () {
                     this._isSpeedUp = false;
