@@ -15,6 +15,7 @@
 		"bin-debug/Public/Alert.js",
 		"bin-debug/Public/AlertEvent.js",
 		"bin-debug/Public/Bitmap.js",
-		"bin-debug/Public/Info.js"
+		"bin-debug/Public/Info.js",
+		"bin-debug/Public/Movie.js"
 	]
 }

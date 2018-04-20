@@ -21,6 +21,7 @@ class Games extends egret.DisplayObjectContainer {
 	private _bgMoveSpeed = 10;	//背景移动速度
 	private _baseSpeed = 1;		//速度系数,加速时增加
 	private _isSpeedUp:boolean = false;	//是否加速
+	private _guide;
 
 	private _locusW = 8;	//初始轨迹宽度
 	private _lastLocusPointX;	//上个轨迹点的x坐标
@@ -57,30 +58,16 @@ class Games extends egret.DisplayObjectContainer {
 		// }, this);
 		// sound.load("resource/sound/bg.mp3");
 
-		
-		//添加背景1
-		this._gameBg1 = new egret.Sprite();
-		this._gameBg1.x = 0;
-		this._gameBg1.y = 0;
-		this._gameBg1.width = this._stageW;
-		this._gameBg1.height = this._stageH;
-		this._gameBg1.graphics.beginFill(0xFFF8F5);
-        this._gameBg1.graphics.drawRect(0, 0, this._gameBg1.width, this._gameBg1.height);
-        this._gameBg1.graphics.endFill();
-        this.addChild(this._gameBg1);
-		
-
-		//添加背景2
-		this._gameBg2 = new egret.Sprite();
-		this._gameBg2.x = 0;
-		this._gameBg2.y = this._stageH;
-		this._gameBg2.width = this._stageW;
-		this._gameBg2.height = this._stageH;
-		this._gameBg2.graphics.beginFill(0xEBBCB5);
-        this._gameBg2.graphics.drawRect(0, 0, this._gameBg2.width, this._gameBg2.height);
-        this._gameBg2.graphics.endFill();
-        this.addChild(this._gameBg2);
-		
+		//固定背景
+		let _gameBg = new egret.Sprite();
+		_gameBg.x = 0;
+		_gameBg.y = 0;
+		_gameBg.width = this._stageW;
+		_gameBg.height = this._stageH;
+		_gameBg.graphics.beginFill(0xFFF8F5);
+        _gameBg.graphics.drawRect(0, 0, _gameBg.width, _gameBg.height);
+        _gameBg.graphics.endFill();
+        this.addChild(_gameBg);
 
 		//添加小球
 		this._ball.x = this._stageW/2;
@@ -88,7 +75,32 @@ class Games extends egret.DisplayObjectContainer {
 		this._ball.width = 40;
 		this._ball.height = 40;
 		this.addChild(this._ball);
+		
+		this._guide = new Movie();
+        this._guide.init("guide_json","guide_png","guide",-1);
+		this._guide.alpha =1;
+        this._guide.x = 200;
+		this._guide.y = 340;
+		this._guide.width = 100;
+		this._guide.height = 60;
+		// this.addChild(this._guide);
 
+		//添加背景1
+		this._gameBg1 = new egret.Sprite();
+		this._gameBg1.x = 0;
+		this._gameBg1.y = 0;
+		this._gameBg1.width = this._stageW;
+		this._gameBg1.height = this._stageH;
+        this.addChild(this._gameBg1);
+		
+		//添加背景2
+		this._gameBg2 = new egret.Sprite();
+		this._gameBg2.x = 0;
+		this._gameBg2.y = this._stageH;
+		this._gameBg2.width = this._stageW;
+		this._gameBg2.height = this._stageH;
+        this.addChild(this._gameBg2);
+		
 		this.addBarriers(1);
 		this.addBarriers(2);
 
@@ -150,24 +162,25 @@ class Games extends egret.DisplayObjectContainer {
 
 	//实时监听
 	private frameObserve () {
+
 		//根据移动方向设置球的位置,触碰到边缘游戏结束
 		if(this._moveToRight == true) {
-			if(this._ball.x > (this._stageW-this._ball.width)) {
-				this._ball.x = this._stageW-this._ball.width;
+			if(this._ball.x >= (this._stageW-this._ball.width)) {
 				this.gameOverFunc();
 			} else {
 				this._ball.x += this._ballMoveSpeed;
 			}
+			this._guide.x = this._ball.x+50;
 		} else {
-			if(this._ball.x < 0) {
-				this._ball.x = 0;
+			if(this._ball.x <= 0) {
 				this.gameOverFunc();
 			} else {
 				this._ball.x -= this._ballMoveSpeed;
 			}
+			this._guide.x = this._ball.x-50;
 		}
 
-		//游戏背景移动
+		//移动游戏背景
 		this._gameBg1.y -= this._bgMoveSpeed*this._baseSpeed;
 		this._gameBg2.y -= this._bgMoveSpeed*this._baseSpeed;
 
@@ -185,8 +198,6 @@ class Games extends egret.DisplayObjectContainer {
 			this._locusPointAaray.splice(0, this._locusPointAaray.length);
 			this.addBarriers(2);
 		}
-
-		
 
 		let locusPoint = new egret.Shape();	//轨迹点
 		let currentLocusPointY = 0;	//点相对于背景图的Y值
@@ -220,7 +231,7 @@ class Games extends egret.DisplayObjectContainer {
 		this._locusPointAaray.reverse();
 
 		for (var i = 0; i < this._locusPointAaray.length; i++) {
-			let maxWidth = this._locusW*0.05*i;
+			let maxWidth = this._locusW*0.055*i;
 			if(maxWidth > this._locusW*4) {
 				maxWidth = this._locusW*4;	
 			}
@@ -249,6 +260,14 @@ class Games extends egret.DisplayObjectContainer {
         bufferTimer.addEventListener(egret.TimerEvent.TIMER, this.bufferTimerFunc, this);
         bufferTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, this.bufferTimerComFunc, this);
         bufferTimer.start();
+
+		this._guide.alpha = 1;
+
+		var guideTimer: egret.Timer = new egret.Timer(500, 1);
+		guideTimer.addEventListener(egret.TimerEvent.TIMER, function() {
+			this._guide.alpha = 1;
+		}, this);
+        guideTimer.start();
 	}
 	//减速
  	private bufferTimerFunc(event:egret.TimerEvent) {
