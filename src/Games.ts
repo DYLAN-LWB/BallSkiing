@@ -37,7 +37,7 @@ class Games extends egret.DisplayObjectContainer {
 	private _letterTFArray2 = [];	//字符数组
 
 	private _wordsArray = [];	//单词数组
-	private _currentWordDict;	//当前要吃的单词信息
+	private _wordIndex = 0;	//当前是第几个单词
 	private _wordTextField;		//显示的单词
 	private _translateTextField;	//显示的翻译
 	private _missLetter;//
@@ -46,6 +46,23 @@ class Games extends egret.DisplayObjectContainer {
 		this._stageW = this.stage.stageWidth;
 		this._stageH = this.stage.stageHeight;
 
+		this._wordsArray = [
+			{
+				"word":"Mondy",
+				"chinese":"周一"
+			},
+			{
+				"word":"Tuesday",
+				"chinese":"周二"
+			},
+			{
+				"word":"Wednesday",
+				"chinese":"周三"
+			},
+			{
+				"word":"Thursday",
+				"chinese":"周四"
+			}];
 		this.setupViews();
 	}
 
@@ -145,15 +162,13 @@ class Games extends egret.DisplayObjectContainer {
 
 	//更新单词
 	private updataWord() {
-
-		// let word = this._currentWordDict[""];
-		let word = "Mondy";
+		
+		let word = this._wordsArray[this._wordIndex]["word"];
 		let location = Math.floor(Math.random()*word.length);
 		this._missLetter = word.slice(location,location+1);
 		word = word.replace(this._missLetter,"( )");
 		this._wordTextField.text = word;
-		this._translateTextField.text = "周一";
-
+		this._translateTextField.text = this._wordsArray[this._wordIndex]["chinese"]
 
 	}
 
@@ -304,7 +319,7 @@ class Games extends egret.DisplayObjectContainer {
 				maxWidth = this._locusW;
 			}
 			var point = this._locusPointAaray[i]["object"];	// 红 0xEBBCB5
-			point.graphics.lineStyle(maxWidth, this._isSpeedUp ? 0xCDE3E2 : 0xCDE3E2, 1, true);
+			point.graphics.lineStyle(maxWidth, this._isSpeedUp ? 0xEBBCB5 : 0xCDE3E2, 1, true);
 			point.graphics.moveTo(this._locusPointAaray[i]["beginX"], this._locusPointAaray[i]["beginY"]);
 			point.graphics.lineTo(this._locusPointAaray[i]["endX"] , this._locusPointAaray[i]["endY"]);
 		}
@@ -393,19 +408,22 @@ class Games extends egret.DisplayObjectContainer {
 	}
 
 	private hitWordLetter(text) {
-		console.log(text);
+		if(text == this._missLetter) {
 
-				// this._isSpeedUp = true;
-				// this._baseSpeed = 1.5;
-				// if(this.seppedTimer) {
-				// 	this.seppedTimer.reset();
-				// }
-				// this.seppedTimer = new egret.Timer(2000, 1);
-				// this.seppedTimer.addEventListener(egret.TimerEvent.TIMER, function() {
-				// 	this._isSpeedUp = false;
-				// 	this._baseSpeed = 1;
-				// }, this);
-				// this.seppedTimer.start();
+			this._wordTextField.text = this._wordTextField.text.replace("( )","("+ text + ")");
+
+			if(this._wordIndex < this._wordsArray.length-1) {
+				this._isSpeedUp = true;
+				this._baseSpeed = 1.5;
+				var speed:number = egret.setTimeout(function(param){
+					
+					this._isSpeedUp = false;
+					this._baseSpeed = 1;
+					this._wordIndex++;
+					this.updataWord();				
+				}, this, 2000, "param");
+			}
+		}
 	}
 
 	//游戏结束
@@ -416,9 +434,9 @@ class Games extends egret.DisplayObjectContainer {
 		if (this._backgroundChannel) this._backgroundChannel.stop();
 		// // this.gameOver();
 		// //test
-		// this._normalAlert = new Alert(Alert.GamePageScore, "999", "1000", "1", 0,this._stageW,this._stageH);
-		// this._normalAlert.addEventListener(AlertEvent.Restart, this.restart, this);
-		// this.addChild(this._normalAlert);
+		this._normalAlert = new Alert(Alert.GamePageScore, "999", "1000", "1", 0,this._stageW,this._stageH);
+		this._normalAlert.addEventListener(AlertEvent.Restart, this.restart, this);
+		this.addChild(this._normalAlert);
 	}
 	private restart() {
 		this.removeChildren();

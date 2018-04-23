@@ -32,12 +32,31 @@ var Games = (function (_super) {
         _this._letterTFArray1 = []; //字符数组
         _this._letterTFArray2 = []; //字符数组
         _this._wordsArray = []; //单词数组
+        _this._wordIndex = 0; //当前是第几个单词
         _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.createGameScene, _this);
         return _this;
     }
     Games.prototype.createGameScene = function () {
         this._stageW = this.stage.stageWidth;
         this._stageH = this.stage.stageHeight;
+        this._wordsArray = [
+            {
+                "word": "Mondy",
+                "chinese": "周一"
+            },
+            {
+                "word": "Tuesday",
+                "chinese": "周二"
+            },
+            {
+                "word": "Wednesday",
+                "chinese": "周三"
+            },
+            {
+                "word": "Thursday",
+                "chinese": "周四"
+            }
+        ];
         this.setupViews();
     };
     Games.prototype.setupViews = function () {
@@ -124,13 +143,12 @@ var Games = (function (_super) {
     };
     //更新单词
     Games.prototype.updataWord = function () {
-        // let word = this._currentWordDict[""];
-        var word = "Mondy";
+        var word = this._wordsArray[this._wordIndex]["word"];
         var location = Math.floor(Math.random() * word.length);
         this._missLetter = word.slice(location, location + 1);
         word = word.replace(this._missLetter, "( )");
         this._wordTextField.text = word;
-        this._translateTextField.text = "周一";
+        this._translateTextField.text = this._wordsArray[this._wordIndex]["chinese"];
     };
     Games.prototype.addBarriers = function (page) {
         if (page == 1) {
@@ -269,7 +287,7 @@ var Games = (function (_super) {
                 maxWidth = this._locusW;
             }
             var point = this._locusPointAaray[i]["object"]; // 红 0xEBBCB5
-            point.graphics.lineStyle(maxWidth, this._isSpeedUp ? 0xCDE3E2 : 0xCDE3E2, 1, true);
+            point.graphics.lineStyle(maxWidth, this._isSpeedUp ? 0xEBBCB5 : 0xCDE3E2, 1, true);
             point.graphics.moveTo(this._locusPointAaray[i]["beginX"], this._locusPointAaray[i]["beginY"]);
             point.graphics.lineTo(this._locusPointAaray[i]["endX"], this._locusPointAaray[i]["endY"]);
         }
@@ -348,18 +366,19 @@ var Games = (function (_super) {
         }
     };
     Games.prototype.hitWordLetter = function (text) {
-        console.log(text);
-        // this._isSpeedUp = true;
-        // this._baseSpeed = 1.5;
-        // if(this.seppedTimer) {
-        // 	this.seppedTimer.reset();
-        // }
-        // this.seppedTimer = new egret.Timer(2000, 1);
-        // this.seppedTimer.addEventListener(egret.TimerEvent.TIMER, function() {
-        // 	this._isSpeedUp = false;
-        // 	this._baseSpeed = 1;
-        // }, this);
-        // this.seppedTimer.start();
+        if (text == this._missLetter) {
+            this._wordTextField.text = this._wordTextField.text.replace("( )", "(" + text + ")");
+            this._isSpeedUp = true;
+            this._baseSpeed = 1.5;
+            var speed = egret.setTimeout(function (param) {
+                this._isSpeedUp = false;
+                this._baseSpeed = 1;
+                if (this._wordIndex < this._wordsArray.length - 1) {
+                    this._wordIndex++;
+                    this.updataWord();
+                }
+            }, this, 2000, "param");
+        }
     };
     //游戏结束
     Games.prototype.gameOverFunc = function () {
