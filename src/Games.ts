@@ -33,7 +33,14 @@ class Games extends egret.DisplayObjectContainer {
 	private _gameBg2;	//背景2
 	private _barrierArray1 = [];	//障碍物数组
 	private _barrierArray2 = [];	//障碍物数组
+	private _letterTFArray1 = [];	//字符数组
+	private _letterTFArray2 = [];	//字符数组
 
+	private _wordsArray = [];	//单词数组
+	private _currentWordDict;	//当前要吃的单词信息
+	private _wordTextField;		//显示的单词
+	private _translateTextField;	//显示的翻译
+	private _missLetter;//
 
 	private createGameScene() {
 		this._stageW = this.stage.stageWidth;
@@ -83,15 +90,41 @@ class Games extends egret.DisplayObjectContainer {
 		this._guide.height = 60;
 		// this.addChild(this._guide);
 
+		//添加成语
+		this._wordTextField  = new egret.TextField;
+		this._wordTextField.x = 0;
+		this._wordTextField.y = 50;
+		this._wordTextField.width = this._stageW/2;
+		this._wordTextField.height = 50;
+		this._wordTextField.textColor = 0xFF0000;
+		this._wordTextField.verticalAlign = egret.VerticalAlign.MIDDLE;
+		this._wordTextField.textAlign = egret.HorizontalAlign.CENTER;
+		this._wordTextField.size = 35;
+		this._wordTextField.text = "";
+		this._wordTextField.fontFamily = "Microsoft YaHei";
+		this.addChild(this._wordTextField);
+
+		this._translateTextField  = new egret.TextField;
+		this._translateTextField.x = 0;
+		this._translateTextField.y = 100;
+		this._translateTextField.width = this._stageW/2;
+		this._translateTextField.height = 50;
+		this._translateTextField.textColor = 0xFF0000;
+		this._translateTextField.verticalAlign = egret.VerticalAlign.MIDDLE;
+		this._translateTextField.textAlign = egret.HorizontalAlign.CENTER;
+		this._translateTextField.size = 35;
+		this._translateTextField.text = "";
+		this._translateTextField.fontFamily = "Microsoft YaHei";
+		this.addChild(this._translateTextField);
+
+		this.updataWord();
+
 		//添加背景1
 		this._gameBg1 = new egret.Sprite();
 		this._gameBg1.x = 0;
 		this._gameBg1.y = 0;
 		this._gameBg1.width = this._stageW;
 		this._gameBg1.height = this._stageH;
-		// this._gameBg1.graphics.beginFill(0xFFC1C1);
-        // this._gameBg1.graphics.drawRect(0, 0, this._gameBg1.width, this._gameBg1.height);
-        // this._gameBg1.graphics.endFill();
         this.addChild(this._gameBg1);
 		
 		//添加背景2
@@ -100,9 +133,6 @@ class Games extends egret.DisplayObjectContainer {
 		this._gameBg2.y = this._stageH;
 		this._gameBg2.width = this._stageW;
 		this._gameBg2.height = this._stageH;
-		// this._gameBg2.graphics.beginFill(0xFFF68F);
-        // this._gameBg2.graphics.drawRect(0, 0, this._gameBg2.width, this._gameBg2.height);
-        // this._gameBg2.graphics.endFill();
         this.addChild(this._gameBg2);
 		
 		this.addBarriers(1);
@@ -113,6 +143,20 @@ class Games extends egret.DisplayObjectContainer {
 		this._lastLocusPointY = 400;
 	}
 
+	//更新单词
+	private updataWord() {
+
+		// let word = this._currentWordDict[""];
+		let word = "Mondy";
+		let location = Math.floor(Math.random()*word.length);
+		this._missLetter = word.slice(location,location+1);
+		word = word.replace(this._missLetter,"( )");
+		this._wordTextField.text = word;
+		this._translateTextField.text = "周一";
+
+
+	}
+
 	private addBarriers(page) {
 		if(page == 1) {
 			this._barrierArray1.splice(0, this._barrierArray1.length);
@@ -120,22 +164,22 @@ class Games extends egret.DisplayObjectContainer {
 			this._barrierArray2.splice(0, this._barrierArray2.length);
 		}
 
-		for(var i = 0; i < ((this._isFitstApperar ? 5 : 10)+Math.random()*5); i++) {
+		for(var i = 0; i < ((this._isFitstApperar ? 2 : 5)+Math.random()*5); i++) {
 
 			//障碍物背景,爆炸
 			let barrierBg = new egret.Sprite;
 			barrierBg.x = Math.random()*(this._stageW-80);
 			barrierBg.y = Math.random()*(this._stageH-80-(this._isFitstApperar ? 700 : 0)) + (this._isFitstApperar ? 700 : 0);
-			barrierBg.width = 40;
-			barrierBg.height = 40;
+			barrierBg.width = 50;
+			barrierBg.height = 50;
 			barrierBg.graphics.beginFill(0xFF0000,0.01);
 			barrierBg.graphics.drawCircle(20, 20, 20);
 			barrierBg.graphics.endFill();
 
 			//障碍物
 			let barrier  = new Bitmap("monster_png");
-			barrier.x = 5;
-			barrier.y = 5;
+			barrier.x = 10;
+			barrier.y = 10;
 			barrier.width = 30;
 			barrier.height = 30;
 			barrierBg.addChild(barrier);
@@ -147,6 +191,38 @@ class Games extends egret.DisplayObjectContainer {
 				this._gameBg2.addChild(barrierBg);
 				this._barrierArray2.push(barrierBg);
 			}
+		}
+
+		//添加字母
+		let letterArray = ["a","b","c","d","e","f","g","h","i","g","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
+		let randomLetter = [];
+		for (var i = 0; i < 3; i++){
+			randomLetter.push(letterArray[Math.floor(Math.random()*letterArray.length)]);
+		}
+		randomLetter.push(this._missLetter);
+
+		for(var l = 0; l < randomLetter.length; l++) {
+			let letter  = new egret.TextField;
+			letter.x = Math.random()*(this._stageW-80);
+			letter.y = Math.random()*(this._stageH-80-(this._isFitstApperar ? 700 : 0)) + (this._isFitstApperar ? 700 : 0);
+			letter.width = 50;
+			letter.height = 50;
+			letter.textColor = 0xFF0000;
+			letter.backgroundColor = 0x545454;
+			letter.verticalAlign = egret.VerticalAlign.MIDDLE;
+			letter.textAlign = egret.HorizontalAlign.CENTER;
+			letter.size = 25;
+			letter.text = randomLetter[l];
+			letter.fontFamily = "Microsoft YaHei";
+			letter.text = randomLetter[l];
+			if(page == 1) {
+				this._gameBg1.addChild(letter);
+				this._letterTFArray1.push(letter);
+			} else {
+				this._gameBg2.addChild(letter);
+				this._letterTFArray2.push(letter);
+			}
+
 		}
 	}
 
@@ -206,8 +282,7 @@ class Games extends egret.DisplayObjectContainer {
 			this._lastLocusPointY = (currentLocusPointY) - this._bgMoveSpeed*this._baseSpeed;
 		}
 
-		
-		// //保存对象,起点,终点
+		//保存对象,起点,终点
 		var dict = {
 			"beginX":this._lastLocusPointX,
 			"beginY":this._lastLocusPointY,
@@ -282,6 +357,44 @@ class Games extends egret.DisplayObjectContainer {
 		}
     }
 
+	private checkBarrierHit() {
+
+		for(let index = 0; index < this._barrierArray1.length; index++) {
+			let bar = this._barrierArray1[index];
+			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
+			if(_isHit) {
+				// this.gameOverFunc();
+			} 
+		}
+		for(let index = 0; index < this._barrierArray2.length; index++) {
+			let bar = this._barrierArray2[index];
+			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
+			if(_isHit) {
+				// this.gameOverFunc();
+			} 
+		}
+
+		for(let index = 0; index < this._letterTFArray1.length; index++) {
+			let bar = this._letterTFArray1[index];
+			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
+			if(_isHit) {
+				var tf = this._letterTFArray1[index];
+				this.hitWordLetter(tf.text);
+			} 
+		}
+		for(let index = 0; index < this._letterTFArray2.length; index++) {
+			let bar = this._letterTFArray2[index];
+			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
+			if(_isHit) {
+				var tf = this._letterTFArray2[index];
+				this.hitWordLetter(tf.text);
+			} 
+		}
+	}
+
+	private hitWordLetter(text) {
+		console.log(text);
+
 				// this._isSpeedUp = true;
 				// this._baseSpeed = 1.5;
 				// if(this.seppedTimer) {
@@ -293,23 +406,8 @@ class Games extends egret.DisplayObjectContainer {
 				// 	this._baseSpeed = 1;
 				// }, this);
 				// this.seppedTimer.start();
-	private checkBarrierHit() {
-
-		for(let index = 0; index < this._barrierArray1.length; index++) {
-			let bar = this._barrierArray1[index];
-			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
-			if(_isHit) {
-				this.gameOverFunc();
-			} 
-		}
-		for(let index = 0; index < this._barrierArray2.length; index++) {
-			let bar = this._barrierArray2[index];
-			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
-			if(_isHit) {
-				this.gameOverFunc();
-			} 
-		}
 	}
+
 	//游戏结束
 	private gameOverFunc () {
 		// alert("game over");
