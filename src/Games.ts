@@ -31,9 +31,7 @@ class Games extends egret.DisplayObjectContainer {
 
 	private _gameBg1;	//背景1
 	private _gameBg2;	//背景2
-	private _highScoreArray1 = [];	//高分区数组
 	private _barrierArray1 = [];	//障碍物数组
-	private _highScoreArray2 = [];	//高分区数组
 	private _barrierArray2 = [];	//障碍物数组
 
 
@@ -117,28 +115,17 @@ class Games extends egret.DisplayObjectContainer {
 
 	private addBarriers(page) {
 		if(page == 1) {
-			this._highScoreArray1.splice(0, this._highScoreArray1.length);
 			this._barrierArray1.splice(0, this._barrierArray1.length);
 		} else {
-			this._highScoreArray2.splice(0, this._highScoreArray2.length);
 			this._barrierArray2.splice(0, this._barrierArray2.length);
 		}
 
 		for(var i = 0; i < ((this._isFitstApperar ? 5 : 10)+Math.random()*5); i++) {
-			//高分区
-			let scoreBg = new egret.Sprite;
-			scoreBg.x = Math.random()*(this._stageW-80);
-			scoreBg.y = Math.random()*(this._stageH-80-(this._isFitstApperar ? 700 : 0)) + (this._isFitstApperar ? 700 : 0);
-			scoreBg.width = 80;
-			scoreBg.height = 80;
-			scoreBg.graphics.beginFill(0x53868B,0.01);
-			scoreBg.graphics.drawCircle(40, 40, 40);
-			scoreBg.graphics.endFill();
 
 			//障碍物背景,爆炸
 			let barrierBg = new egret.Sprite;
-			barrierBg.x = scoreBg.x + 20;
-			barrierBg.y = scoreBg.y + 20;
+			barrierBg.x = Math.random()*(this._stageW-80);
+			barrierBg.y = Math.random()*(this._stageH-80-(this._isFitstApperar ? 700 : 0)) + (this._isFitstApperar ? 700 : 0);
 			barrierBg.width = 40;
 			barrierBg.height = 40;
 			barrierBg.graphics.beginFill(0xFF0000,0.01);
@@ -154,14 +141,10 @@ class Games extends egret.DisplayObjectContainer {
 			barrierBg.addChild(barrier);
 
 			if(page == 1) {
-				this._gameBg1.addChild(scoreBg);
 				this._gameBg1.addChild(barrierBg);
-				this._highScoreArray1.push(scoreBg);
 				this._barrierArray1.push(barrierBg);
 			} else {
-				this._gameBg2.addChild(scoreBg);
 				this._gameBg2.addChild(barrierBg);
-				this._highScoreArray2.push(scoreBg);
 				this._barrierArray2.push(barrierBg);
 			}
 		}
@@ -257,8 +240,6 @@ class Games extends egret.DisplayObjectContainer {
 
 		//碰撞检测
 		this.checkBarrierHit();
-		this.checkHighScoreHit();
-
 	}
  
 	//点击屏幕
@@ -301,48 +282,17 @@ class Games extends egret.DisplayObjectContainer {
 		}
     }
 
-	private seppedTimer: egret.Timer;
-	private checkHighScoreHit() {
-
-		for(let index = 0; index < this._highScoreArray1.length; index++) {
-			let bar = this._highScoreArray1[index];
-			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
-			if(_isHit) {
-				// console.log("加速");
-				this._isSpeedUp = true;
-				this._baseSpeed = 1.5;
-				if(this.seppedTimer) {
-					this.seppedTimer.reset();
-				}
-				this.seppedTimer = new egret.Timer(2000, 1);
-				this.seppedTimer.addEventListener(egret.TimerEvent.TIMER, function() {
-					this._isSpeedUp = false;
-					this._baseSpeed = 1;
-				}, this);
-				this.seppedTimer.start();
-				
-			} 
-		}
-
-		for(let index = 0; index < this._highScoreArray2.length; index++) {
-			let bar = this._highScoreArray2[index];
-			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
-			if(_isHit) {
-				// console.log("加速");
-				this._isSpeedUp = true;
-				this._baseSpeed = 1.5;
-				if(this.seppedTimer) {
-					this.seppedTimer.reset();
-				}
-				this.seppedTimer = new egret.Timer(2000, 1);
-				this.seppedTimer.addEventListener(egret.TimerEvent.TIMER, function() {
-					this._isSpeedUp = false;
-					this._baseSpeed = 1;
-				}, this);
-				this.seppedTimer.start();
-			} 
-		}
-	}
+				// this._isSpeedUp = true;
+				// this._baseSpeed = 1.5;
+				// if(this.seppedTimer) {
+				// 	this.seppedTimer.reset();
+				// }
+				// this.seppedTimer = new egret.Timer(2000, 1);
+				// this.seppedTimer.addEventListener(egret.TimerEvent.TIMER, function() {
+				// 	this._isSpeedUp = false;
+				// 	this._baseSpeed = 1;
+				// }, this);
+				// this.seppedTimer.start();
 	private checkBarrierHit() {
 
 		for(let index = 0; index < this._barrierArray1.length; index++) {
@@ -375,9 +325,7 @@ class Games extends egret.DisplayObjectContainer {
 	private restart() {
 		this.removeChildren();
 
-		this._highScoreArray1.splice(0, this._highScoreArray1.length);
 		this._barrierArray1.splice(0, this._barrierArray1.length);
-		this._highScoreArray2.splice(0, this._highScoreArray2.length);
 		this._barrierArray2.splice(0, this._barrierArray2.length);
 
 		this._moveToRight = true;	//小球是否在向右移动
