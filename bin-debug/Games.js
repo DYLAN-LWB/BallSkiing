@@ -17,7 +17,7 @@ var Games = (function (_super) {
         var _this = _super.call(this) || this;
         //public
         _this._info = new Info(); //公用信息表
-        _this._score = 0; //游戏分数
+        _this._score = 0; //分数
         _this._ball = new Bitmap("ball_png"); //小球
         _this._moveToRight = true; //小球是否在向右移动
         _this._ballY = 400;
@@ -81,13 +81,15 @@ var Games = (function (_super) {
         this._ball.y = this._ballY;
         this.addChild(this._ball);
         this._guide = new Movie();
-        this._guide.init("guide_json", "guide_png", "guide", -1);
+        this._guide.init("speed_json", "speed_png", "speed", -1);
         this._guide.alpha = 1;
-        this._guide.x = 200;
-        this._guide.y = 340;
-        this._guide.width = 100;
+        this._guide.width = 60;
         this._guide.height = 60;
-        // this.addChild(this._guide);
+        this._guide.anchorOffsetX = this._guide.width / 2;
+        this._guide.anchorOffsetY = this._guide.height;
+        this._guide.x = this._ball.x;
+        this._guide.y = this._ball.y;
+        this.addChild(this._guide);
         //单词
         this._wordTextField = new egret.TextField;
         this._wordTextField.x = 0;
@@ -114,6 +116,47 @@ var Games = (function (_super) {
         this._translateTextField.text = "";
         this._translateTextField.fontFamily = "Microsoft YaHei";
         this.addChild(this._translateTextField);
+        //分数
+        var _scoreText = new egret.TextField;
+        _scoreText.x = this._stageW / 2;
+        _scoreText.y = 50;
+        _scoreText.width = this._stageW / 2;
+        _scoreText.height = 50;
+        _scoreText.textColor = 0x7ed7de;
+        _scoreText.verticalAlign = egret.VerticalAlign.MIDDLE;
+        _scoreText.textAlign = egret.HorizontalAlign.CENTER;
+        _scoreText.size = 35;
+        _scoreText.text = "得分";
+        _scoreText.fontFamily = "Microsoft YaHei";
+        this.addChild(_scoreText);
+        this._scoreTextField = new egret.TextField;
+        this._scoreTextField.x = this._stageW / 2;
+        this._scoreTextField.y = 100;
+        this._scoreTextField.width = this._stageW / 2;
+        this._scoreTextField.height = 50;
+        this._scoreTextField.textColor = 0x7ed7de;
+        this._scoreTextField.verticalAlign = egret.VerticalAlign.MIDDLE;
+        this._scoreTextField.textAlign = egret.HorizontalAlign.CENTER;
+        this._scoreTextField.size = 35;
+        this._scoreTextField.text = "0";
+        this._scoreTextField.fontFamily = "Microsoft YaHei";
+        this.addChild(this._scoreTextField);
+        this._gameTimer = new egret.Timer(1000, 99999);
+        this._gameTimer.addEventListener(egret.TimerEvent.TIMER, function () {
+            //改变分数
+            this._score++;
+            this._scoreTextField.text = "" + this._score;
+            if (this._isSpeedUp) {
+                var speedTimer = new egret.Timer(500, 1);
+                speedTimer.addEventListener(egret.TimerEvent.TIMER, function () {
+                    //改变分数
+                    this._score++;
+                    this._scoreTextField.text = "" + this._score;
+                }, this);
+                speedTimer.start();
+            }
+        }, this);
+        this._gameTimer.start();
         //初次更新单词
         this.updateWord();
         //添加背景1
@@ -238,6 +281,9 @@ var Games = (function (_super) {
         if ((this._ball.x >= (this._stageW - this._ball.width)) || this._ball.x <= 0) {
             this.gameOverFunc();
         }
+        //动画位置
+        this._guide.x = this._ball.x;
+        this._guide.y = this._ball.y;
         //移动游戏背景
         this._gameBg1.y -= this._bgMoveSpeed * this._baseSpeed;
         this._gameBg2.y -= this._bgMoveSpeed * this._baseSpeed;
@@ -313,11 +359,11 @@ var Games = (function (_super) {
         bufferTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, this.bufferTimerComFunc, this);
         bufferTimer.start();
         this._guide.alpha = 1;
-        var guideTimer = new egret.Timer(500, 1);
-        guideTimer.addEventListener(egret.TimerEvent.TIMER, function () {
+        this._guide.rotation = this._moveToRight ? 90 : -90;
+        var speed = egret.setTimeout(function (param) {
             this._guide.alpha = 1;
-        }, this);
-        guideTimer.start();
+            this._guide.rotation = 0;
+        }, this, 2000, "param");
     };
     //减速
     Games.prototype.bufferTimerFunc = function (event) {
@@ -402,11 +448,13 @@ var Games = (function (_super) {
         // alert("game over");
         this.stage.removeEventListener(egret.TouchEvent.TOUCH_BEGIN, this.touchBegin, this);
         this.removeEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
+        if (this._gameTimer)
+            this._gameTimer.stop();
         if (this._backgroundChannel)
             this._backgroundChannel.stop();
         // // this.gameOver();
         // //test
-        this._normalAlert = new Alert(Alert.GamePageScore, "999", "1000", "1", 0, this._stageW, this._stageH);
+        this._normalAlert = new Alert(Alert.GamePageScore, "" + this._score, "1000", "1", 0, this._stageW, this._stageH);
         this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
         this.addChild(this._normalAlert);
     };
