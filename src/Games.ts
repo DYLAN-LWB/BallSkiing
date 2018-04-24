@@ -17,6 +17,7 @@ class Games extends egret.DisplayObjectContainer {
 
 	private _ball = new Bitmap("ball_png");	//小球
 	private _moveToRight:boolean = true;	//小球是否在向右移动
+	private _ballY = 400;
 	private _ballMoveSpeed = 10;	//小球移动速度
 	private _bgMoveSpeed = 10;	//背景移动速度
 	private _baseSpeed = 1;		//速度系数,加速时增加
@@ -94,29 +95,21 @@ class Games extends egret.DisplayObjectContainer {
 		this.addEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
 
 		//背景音乐
-		// let sound = new egret.Sound();
-		// sound.addEventListener(egret.Event.COMPLETE, function() {
-		// 	this._backgroundChannel = sound.play(0,0);
-		// 	this._backgroundChannel.volume = 0.8;
-		// }, this);
-		// sound.load("resource/sound/bg.mp3");
-
-		//固定背景
-		let _gameBg = new egret.Sprite();
-		_gameBg.x = 0;
-		_gameBg.y = 0;
-		_gameBg.width = this._stageW;
-		_gameBg.height = this._stageH;
-		_gameBg.graphics.beginFill(0xffffff);
-        _gameBg.graphics.drawRect(0, 0, _gameBg.width, _gameBg.height);
-        _gameBg.graphics.endFill();
-        this.addChild(_gameBg);
+		let sound = new egret.Sound();
+		sound.addEventListener(egret.Event.COMPLETE, function() {
+			this._backgroundChannel = sound.play(0,0);
+			this._backgroundChannel.volume = 0.8;
+		}, this);
+		sound.load("bg_mp3");
 
 		//添加小球
-		this._ball.x = this._stageW/2;
-		this._ball.y = 400;
+		
 		this._ball.width = 30;
 		this._ball.height = 30;
+		this._ball.anchorOffsetX = this._ball.width/2;
+		this._ball.anchorOffsetY = this._ball.height/2;
+		this._ball.x = this._stageW/2;
+		this._ball.y = this._ballY;
 		this.addChild(this._ball);
 		
 		this._guide = new Movie();
@@ -128,13 +121,13 @@ class Games extends egret.DisplayObjectContainer {
 		this._guide.height = 60;
 		// this.addChild(this._guide);
 
-		//添加成语
+		//单词
 		this._wordTextField  = new egret.TextField;
 		this._wordTextField.x = 0;
 		this._wordTextField.y = 50;
 		this._wordTextField.width = this._stageW/2;
 		this._wordTextField.height = 50;
-		this._wordTextField.textColor = 0xFF0000;
+		this._wordTextField.textColor = 0xffa340;
 		this._wordTextField.verticalAlign = egret.VerticalAlign.MIDDLE;
 		this._wordTextField.textAlign = egret.HorizontalAlign.CENTER;
 		this._wordTextField.size = 35;
@@ -142,12 +135,13 @@ class Games extends egret.DisplayObjectContainer {
 		this._wordTextField.fontFamily = "Microsoft YaHei";
 		this.addChild(this._wordTextField);
 
+		//翻译
 		this._translateTextField  = new egret.TextField;
 		this._translateTextField.x = 0;
 		this._translateTextField.y = 100;
 		this._translateTextField.width = this._stageW/2;
 		this._translateTextField.height = 50;
-		this._translateTextField.textColor = 0xFF0000;
+		this._translateTextField.textColor = 0xffa340;
 		this._translateTextField.verticalAlign = egret.VerticalAlign.MIDDLE;
 		this._translateTextField.textAlign = egret.HorizontalAlign.CENTER;
 		this._translateTextField.size = 35;
@@ -155,6 +149,7 @@ class Games extends egret.DisplayObjectContainer {
 		this._translateTextField.fontFamily = "Microsoft YaHei";
 		this.addChild(this._translateTextField);
 
+		//初次更新单词
 		this.updataWord();
 
 		//添加背景1
@@ -177,8 +172,8 @@ class Games extends egret.DisplayObjectContainer {
 		this._isFitstApperar = false;
 		this.addBarriers(2);
 
-		this._lastLocusPointX = this._stageW/2 + this._ball.width/2;
-		this._lastLocusPointY = 400;
+		this._lastLocusPointX = this._stageW/2;
+		this._lastLocusPointY = this._ballY;
 	}
 
 	//更新单词
@@ -200,31 +195,43 @@ class Games extends egret.DisplayObjectContainer {
 			this._letterBgArray2.splice(0, this._letterBgArray2.length);
 		}
 
-		for(var i = 0; i < ((this._isFitstApperar ? 2 : 5)+Math.random()*5); i++) {
+		for(var i = 0; i < ((this._isFitstApperar ? 1 : 3)+Math.random()*3); i++) {
 
-			//障碍物背景,爆炸
-			let barrierBg = new egret.Sprite;
-			barrierBg.x = Math.random()*(this._stageW-80);
-			barrierBg.y = Math.random()*(this._stageH-80-(this._isFitstApperar ? 700 : 0)) + (this._isFitstApperar ? 700 : 0);
-			barrierBg.width = 80;
-			barrierBg.height = 80;
+			//背景
+			let treeBg = new egret.Sprite;
+			treeBg.x = Math.random()*(this._stageW-80);
+			treeBg.y = Math.random()*(this._stageH-80-(this._isFitstApperar ? 700 : 0)) + (this._isFitstApperar ? 700 : 0);
+			treeBg.width = 80;
+			treeBg.height = 80;
 
-			//障碍物
-			let barrier  = new Bitmap("tree_png");
-			barrier.x = 0;
-			barrier.y = 0;
-			barrier.width = 80;
-			barrier.height = 80;
-			barrierBg.addChild(barrier);
+			//🌲
+			let treeImg  = new Bitmap("tree_png");
+			treeImg.x = 0;
+			treeImg.y = 0;
+			treeImg.width = 80;
+			treeImg.height = 80;
+			treeBg.addChild(treeImg);
 
+			//碰撞块
+			let hitObject = new egret.Sprite;
 			
+			hitObject.width = 20;
+			hitObject.height = 20;
+			hitObject.anchorOffsetX = hitObject.width/2;
+			hitObject.anchorOffsetY = hitObject.height/2;
+			hitObject.x = 10;
+			hitObject.y = 55;
+			hitObject.graphics.beginFill(0xff0000,1);
+			hitObject.graphics.drawRect(0,0,20,20);
+			hitObject.graphics.endFill();
+			treeBg.addChild(hitObject);
 
 			if(page == 1) {
-				this._gameBg1.addChild(barrierBg);
-				this._barrierArray1.push(barrierBg);
+				this._gameBg1.addChild(treeBg);
+				this._barrierArray1.push(treeBg);
 			} else {
-				this._gameBg2.addChild(barrierBg);
-				this._barrierArray2.push(barrierBg);
+				this._gameBg2.addChild(treeBg);
+				this._barrierArray2.push(treeBg);
 			}
 		}
 
@@ -261,20 +268,9 @@ class Games extends egret.DisplayObjectContainer {
 	private frameObserve () {
 
 		//根据移动方向设置球的位置,触碰到边缘游戏结束
-		if(this._moveToRight == true) {
-			if(this._ball.x >= (this._stageW-this._ball.width)) {
-				this.gameOverFunc();
-			} else {
-				this._ball.x += this._ballMoveSpeed;
-			}
-			this._guide.x = this._ball.x+50;
-		} else {
-			if(this._ball.x <= 0) {
-				this.gameOverFunc();
-			} else {
-				this._ball.x -= this._ballMoveSpeed;
-			}
-			this._guide.x = this._ball.x-50;
+		this._ball.x += (this._moveToRight == true ? this._ballMoveSpeed : -this._ballMoveSpeed);
+		if((this._ball.x >= (this._stageW-this._ball.width)) || this._ball.x <= 0) {
+			this.gameOverFunc();
 		}
 
 		//移动游戏背景
@@ -298,13 +294,13 @@ class Games extends egret.DisplayObjectContainer {
 
 		let locusPoint = new egret.Shape();	//轨迹点
 		let currentLocusPointY = 0;	//点相对于背景图的Y值
-		//判断添加到哪个背景,背景1的最大Y值在 400 ~ H+400之间
-		if ((this._gameBg1.y+this._gameBg1.height) > 400 && (this._gameBg1.y+this._gameBg1.height) <= (this._stageH+400)) {
+		//判断添加到哪个背景,背景1的最大Y值在 _ballY ~ H+_ballY之间
+		if ((this._gameBg1.y+this._gameBg1.height) > this._ballY && (this._gameBg1.y+this._gameBg1.height) <= (this._stageH+this._ballY)) {
 			this._gameBg1.addChild(locusPoint);
-			currentLocusPointY = 400 - this._gameBg1.y;
+			currentLocusPointY = this._ballY - this._gameBg1.y;
 		} else {
 			this._gameBg2.addChild(locusPoint);
-			currentLocusPointY = 400 - this._gameBg2.y;
+			currentLocusPointY = this._ballY - this._gameBg2.y;
 		}
 
 		//跨背景图时特殊处理
@@ -317,7 +313,7 @@ class Games extends egret.DisplayObjectContainer {
 		var dict = {
 			"beginX":this._lastLocusPointX,
 			"beginY":this._lastLocusPointY,
-			"endX":(this._ball.x + this._ball.width/2),
+			"endX":this._ball.x,
 			"endY":(currentLocusPointY),
 			"object":locusPoint,
 		};
@@ -341,7 +337,7 @@ class Games extends egret.DisplayObjectContainer {
 		}
 
 		//重新保存上次位置
-		this._lastLocusPointX = this._ball.x + this._ball.width/2;
+		this._lastLocusPointX = this._ball.x;
 		this._lastLocusPointY = currentLocusPointY;
 
 		//碰撞检测
@@ -392,14 +388,14 @@ class Games extends egret.DisplayObjectContainer {
 
 		for(let index = 0; index < this._barrierArray1.length; index++) {
 			let bar = this._barrierArray1[index];
-			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
+			let _isHit: boolean = bar.hitTestPoint(this._ball.x, this._ball.y);
 			if(_isHit) {
 				// this.gameOverFunc();
 			} 
 		}
 		for(let index = 0; index < this._barrierArray2.length; index++) {
 			let bar = this._barrierArray2[index];
-			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
+			let _isHit: boolean = bar.hitTestPoint(this._ball.x, this._ball.y);
 			if(_isHit) {
 				// this.gameOverFunc();
 			} 
@@ -407,7 +403,7 @@ class Games extends egret.DisplayObjectContainer {
 
 		for(let index = 0; index < this._letterBgArray1.length; index++) {
 			let bar = this._letterBgArray1[index];
-			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
+			let _isHit: boolean = bar.hitTestPoint(this._ball.x, this._ball.y);
 			if(_isHit) {
 				var tf = this._letterBgArray1[index];
 				if(tf && tf.parent) {
@@ -418,7 +414,7 @@ class Games extends egret.DisplayObjectContainer {
 		}
 		for(let index = 0; index < this._letterBgArray2.length; index++) {
 			let bar = this._letterBgArray2[index];
-			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
+			let _isHit: boolean = bar.hitTestPoint(this._ball.x, this._ball.y);
 			if(_isHit) {
 				var tf = this._letterBgArray2[index];
 				if(tf && tf.parent) {
