@@ -1,7 +1,7 @@
 class Games extends egret.DisplayObjectContainer {
 	public constructor() {
 		super();
-        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.restartGame, this);
+        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.createGameScene, this);
 	}
 
 	//public
@@ -43,25 +43,7 @@ class Games extends egret.DisplayObjectContainer {
 	private _translateTextField;	//显示的翻译
 	private _missLetter;	//单词缺的字母
 
-	private restartGame() {
-		this.removeChildren();
-
-		this._barrierArray1.splice(0, this._barrierArray1.length);
-		this._barrierArray2.splice(0, this._barrierArray2.length);
-		this._letterBgArray1.splice(0, this._letterBgArray1.length);
-		this._letterBgArray2.splice(0, this._letterBgArray2.length);
-
-		this._moveToRight = true;	
-		this._ballMoveSpeed = 10;
-		this._bgMoveSpeed = 10;
-		this._baseSpeed = 1;		
-		this._isSpeedUp = false;	
-		this._isFitstApperar = true;
-		this._wordIndex = 0;
-		
-		// this.minusGameCount();
-		this.createGameScene();
-	}
+	
 
 	private createGameScene() {
 		this._stageW = this.stage.stageWidth;
@@ -103,7 +85,6 @@ class Games extends egret.DisplayObjectContainer {
 		sound.load("bg_mp3");
 
 		//添加小球
-		
 		this._ball.width = 30;
 		this._ball.height = 30;
 		this._ball.anchorOffsetX = this._ball.width/2;
@@ -150,7 +131,7 @@ class Games extends egret.DisplayObjectContainer {
 		this.addChild(this._translateTextField);
 
 		//初次更新单词
-		this.updataWord();
+		this.updateWord();
 
 		//添加背景1
 		this._gameBg1 = new egret.Sprite();
@@ -168,16 +149,18 @@ class Games extends egret.DisplayObjectContainer {
 		this._gameBg2.height = this._stageH;
         this.addChild(this._gameBg2);
 		
+		//背景添加对象
 		this.addBarriers(1);
 		this._isFitstApperar = false;
 		this.addBarriers(2);
 
+		//设置初始位置
 		this._lastLocusPointX = this._stageW/2;
 		this._lastLocusPointY = this._ballY;
 	}
 
 	//更新单词
-	private updataWord() {
+	private updateWord() {
 		let word = this._wordsArray[this._wordIndex]["word"];
 		let location = Math.floor(Math.random()*word.length);
 		this._missLetter = word.slice(location,location+1);
@@ -204,7 +187,7 @@ class Games extends egret.DisplayObjectContainer {
 			treeBg.width = 80;
 			treeBg.height = 80;
 
-			//🌲
+			//树
 			let treeImg  = new Bitmap("tree_png");
 			treeImg.x = 0;
 			treeImg.y = 0;
@@ -214,16 +197,16 @@ class Games extends egret.DisplayObjectContainer {
 
 			//碰撞块
 			let hitObject = new egret.Sprite;
-			
 			hitObject.width = 20;
 			hitObject.height = 20;
 			hitObject.anchorOffsetX = hitObject.width/2;
 			hitObject.anchorOffsetY = hitObject.height/2;
-			hitObject.x = 10;
-			hitObject.y = 55;
-			hitObject.graphics.beginFill(0xff0000,1);
+			hitObject.x = 20;
+			hitObject.y = treeBg.height - 15;
+			hitObject.graphics.beginFill(0xff0000,0.001);
 			hitObject.graphics.drawRect(0,0,20,20);
 			hitObject.graphics.endFill();
+			hitObject.name = "hit";
 			treeBg.addChild(hitObject);
 
 			if(page == 1) {
@@ -245,12 +228,13 @@ class Games extends egret.DisplayObjectContainer {
 
 		for(var l = 0; l < randomLetter.length; l++) {
 
-			let letImg = new Bitmap("Eword_json."+randomLetter[l]);
+			let letter = randomLetter[l].toLowerCase();
+			let letImg = new Bitmap("Eword_json."+letter);
 			letImg.width = 50;
 			letImg.height = 50;
 			letImg.anchorOffsetX = letImg.width/2;
 			letImg.anchorOffsetY = letImg.height/2;
-			letImg.x = Math.random()*(this._stageW-80);
+			letImg.x = 80 + Math.random()*(this._stageW-160);
 			letImg.y = Math.random()*(this._stageH-80-(this._isFitstApperar ? 700 : 0)) + (this._isFitstApperar ? 700 : 0);
 			letImg['name'] = randomLetter[l];
 
@@ -306,7 +290,7 @@ class Games extends egret.DisplayObjectContainer {
 		//跨背景图时特殊处理
 		// console.log("line from= " + this._lastLocusPointY + " ----to " + (currentLocusPointY));
 		if(this._lastLocusPointY >= (this._stageH - this._bgMoveSpeed*this._baseSpeed)) {
-			this._lastLocusPointY = (currentLocusPointY) - this._bgMoveSpeed*this._baseSpeed;
+			this._lastLocusPointY = currentLocusPointY - this._bgMoveSpeed*this._baseSpeed;
 		}
 
 		//保存对象,起点,终点
@@ -314,7 +298,7 @@ class Games extends egret.DisplayObjectContainer {
 			"beginX":this._lastLocusPointX,
 			"beginY":this._lastLocusPointY,
 			"endX":this._ball.x,
-			"endY":(currentLocusPointY),
+			"endY":currentLocusPointY,
 			"object":locusPoint,
 		};
 
@@ -387,17 +371,17 @@ class Games extends egret.DisplayObjectContainer {
 	private checkBarrierHit() {
 
 		for(let index = 0; index < this._barrierArray1.length; index++) {
-			let bar = this._barrierArray1[index];
+			let bar = this._barrierArray1[index].getChildByName("hit");
 			let _isHit: boolean = bar.hitTestPoint(this._ball.x, this._ball.y);
 			if(_isHit) {
-				// this.gameOverFunc();
+				this.gameOverFunc();
 			} 
 		}
 		for(let index = 0; index < this._barrierArray2.length; index++) {
-			let bar = this._barrierArray2[index];
+			let bar = this._barrierArray2[index].getChildByName("hit");
 			let _isHit: boolean = bar.hitTestPoint(this._ball.x, this._ball.y);
 			if(_isHit) {
-				// this.gameOverFunc();
+				this.gameOverFunc();
 			} 
 		}
 
@@ -427,27 +411,21 @@ class Games extends egret.DisplayObjectContainer {
 
 	private hitWordLetter(tf) {
 		console.log(tf["name"]);
-		// console.log(tf.getChildAt(1).text);
 
-		// var myDate = new Date();//获取系统当前时间
-		// console.log(myDate.toLocaleTimeString() + " ----+++++ " + this._wordIndex);
-
-		// if(text == this._missLetter) {
-		// 	this._wordTextField.text = this._wordTextField.text.replace("( )","("+ text + ")");
-		// 	this._wordIndex++;
-		// 	console.log(myDate.toLocaleTimeString() + " ---- " + this._wordIndex);
-		// 	this.updataWord();	
-		// 	if(this._wordIndex < this._wordsArray.length-1) {
-		// 		this._isSpeedUp = true;
-		// 		this._baseSpeed = 1.5;
-		// 		var speed:number = egret.setTimeout(function(param){
-					
-		// 			this._isSpeedUp = false;
-		// 			this._baseSpeed = 1;
-								
-		// 		}, this, 2000, "param");
-		// 	}
-		// }
+		let text = tf["name"];
+		if(text == this._missLetter) {
+			this._wordTextField.text = this._wordTextField.text.replace("( )","("+ text + ")");
+			this._wordIndex++;
+			this.updateWord();	
+			if(this._wordIndex < this._wordsArray.length-1) {
+				this._isSpeedUp = true;
+				this._baseSpeed = 1.5;
+				var speed:number = egret.setTimeout(function(param){
+					this._isSpeedUp = false;
+					this._baseSpeed = 1;
+				}, this, 2000, "param");
+			}
+		}
 	}
 
 	//游戏结束
@@ -463,7 +441,12 @@ class Games extends egret.DisplayObjectContainer {
 		this.addChild(this._normalAlert);
 	}
 
-//接口-减游戏次数
+	private restartGame() {
+		this.removeChildren();
+		this.addChild(new Games());
+	}
+
+	//接口-减游戏次数
 	private minusGameCount() {
 		let params = "?vuid=" + this._info._vuid +
 					 "&key=" + this._info._key +
