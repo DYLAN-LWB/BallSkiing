@@ -20,7 +20,7 @@ var Games = (function (_super) {
         _this._score = 0; //游戏分数
         _this._ball = new Bitmap("person_png"); //小球
         _this._moveToRight = true; //小球是否在向右移动
-        _this._ballMoveSpeed = 8; //小球移动速度
+        _this._ballMoveSpeed = 10; //小球移动速度
         _this._bgMoveSpeed = 10; //背景移动速度
         _this._baseSpeed = 1; //速度系数,加速时增加
         _this._isSpeedUp = false; //是否加速
@@ -33,29 +33,45 @@ var Games = (function (_super) {
         _this._letterTFArray2 = []; //字符数组
         _this._wordsArray = []; //单词数组
         _this._wordIndex = 0; //当前是第几个单词
-        _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.createGameScene, _this);
+        _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.restartGame, _this);
         return _this;
     }
+    Games.prototype.restartGame = function () {
+        this.removeChildren();
+        this._barrierArray1.splice(0, this._barrierArray1.length);
+        this._barrierArray2.splice(0, this._barrierArray2.length);
+        this._letterTFArray1.splice(0, this._letterTFArray1.length);
+        this._letterTFArray2.splice(0, this._letterTFArray2.length);
+        this._moveToRight = true;
+        this._ballMoveSpeed = 10;
+        this._bgMoveSpeed = 10;
+        this._baseSpeed = 1;
+        this._isSpeedUp = false;
+        this._isFitstApperar = true;
+        this._wordIndex = 0;
+        // this.minusGameCount();
+        this.createGameScene();
+    };
     Games.prototype.createGameScene = function () {
         this._stageW = this.stage.stageWidth;
         this._stageH = this.stage.stageHeight;
         this._wordsArray = [
-            {
-                "word": "Mondy",
-                "chinese": "周一"
-            },
-            {
-                "word": "Tuesday",
-                "chinese": "周二"
-            },
-            {
-                "word": "Wednesday",
-                "chinese": "周三"
-            },
-            {
-                "word": "Thursday",
-                "chinese": "周四"
-            }
+            { "word": "Mondy", "chinese": "周一" },
+            { "word": "Tuesday", "chinese": "周二" },
+            { "word": "Wednesday", "chinese": "周三" },
+            { "word": "Thursday", "chinese": "周四" },
+            { "word": "Mondy", "chinese": "周一" },
+            { "word": "Tuesday", "chinese": "周二" },
+            { "word": "Wednesday", "chinese": "周三" },
+            { "word": "Thursday", "chinese": "周四" },
+            { "word": "Mondy", "chinese": "周一" },
+            { "word": "Tuesday", "chinese": "周二" },
+            { "word": "Wednesday", "chinese": "周三" },
+            { "word": "Thursday", "chinese": "周四" },
+            { "word": "Mondy", "chinese": "周一" },
+            { "word": "Tuesday", "chinese": "周二" },
+            { "word": "Wednesday", "chinese": "周三" },
+            { "word": "Thursday", "chinese": "周四" }
         ];
         this.setupViews();
     };
@@ -153,9 +169,11 @@ var Games = (function (_super) {
     Games.prototype.addBarriers = function (page) {
         if (page == 1) {
             this._barrierArray1.splice(0, this._barrierArray1.length);
+            this._letterTFArray1.splice(0, this._letterTFArray1.length);
         }
         else {
             this._barrierArray2.splice(0, this._barrierArray2.length);
+            this._letterTFArray2.splice(0, this._letterTFArray2.length);
         }
         for (var i = 0; i < ((this._isFitstApperar ? 2 : 5) + Math.random() * 5); i++) {
             //障碍物背景,爆炸
@@ -200,7 +218,7 @@ var Games = (function (_super) {
             letter.backgroundColor = 0x545454;
             letter.verticalAlign = egret.VerticalAlign.MIDDLE;
             letter.textAlign = egret.HorizontalAlign.CENTER;
-            letter.size = 25;
+            letter.size = 30;
             letter.text = randomLetter[l];
             letter.fontFamily = "Microsoft YaHei";
             letter.text = randomLetter[l];
@@ -287,7 +305,7 @@ var Games = (function (_super) {
                 maxWidth = this._locusW;
             }
             var point = this._locusPointAaray[i]["object"]; // 红 0xEBBCB5
-            point.graphics.lineStyle(maxWidth, this._isSpeedUp ? 0xEBBCB5 : 0xCDE3E2, 1, true);
+            point.graphics.lineStyle(maxWidth, this._isSpeedUp ? 0xCDE3E2 : 0xCDE3E2, 1, true);
             point.graphics.moveTo(this._locusPointAaray[i]["beginX"], this._locusPointAaray[i]["beginY"]);
             point.graphics.lineTo(this._locusPointAaray[i]["endX"], this._locusPointAaray[i]["endY"]);
         }
@@ -299,7 +317,7 @@ var Games = (function (_super) {
     };
     //点击屏幕
     Games.prototype.touchBegin = function (event) {
-        var bufferTimer = new egret.Timer(10, 20);
+        var bufferTimer = new egret.Timer(5, 20);
         bufferTimer.addEventListener(egret.TimerEvent.TIMER, this.bufferTimerFunc, this);
         bufferTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, this.bufferTimerComFunc, this);
         bufferTimer.start();
@@ -322,15 +340,15 @@ var Games = (function (_super) {
         //更改移动方向
         this._moveToRight = !this._moveToRight;
         this._ballMoveSpeed = 0;
-        var timer = new egret.Timer(10, 20);
+        var timer = new egret.Timer(5, 20);
         timer.addEventListener(egret.TimerEvent.TIMER, this.timerFunc, this);
         timer.start();
     };
     //加速
     Games.prototype.timerFunc = function (event) {
         this._ballMoveSpeed += 0.5;
-        if (this._ballMoveSpeed > 15) {
-            this._ballMoveSpeed = 15;
+        if (this._ballMoveSpeed > 10) {
+            this._ballMoveSpeed = 10;
         }
     };
     Games.prototype.checkBarrierHit = function () {
@@ -353,7 +371,11 @@ var Games = (function (_super) {
             var _isHit = bar.hitTestPoint(this._ball.x + this._ball.width / 2, this._ball.y + this._ball.height);
             if (_isHit) {
                 var tf = this._letterTFArray1[index];
-                this.hitWordLetter(tf.text);
+                console.log(tf);
+                if (tf && tf.parent) {
+                    this.hitWordLetter(tf.text);
+                    tf.parent.removeChild(tf);
+                }
             }
         }
         for (var index = 0; index < this._letterTFArray2.length; index++) {
@@ -361,23 +383,30 @@ var Games = (function (_super) {
             var _isHit = bar.hitTestPoint(this._ball.x + this._ball.width / 2, this._ball.y + this._ball.height);
             if (_isHit) {
                 var tf = this._letterTFArray2[index];
-                this.hitWordLetter(tf.text);
+                console.log(tf);
+                if (tf && tf.parent) {
+                    this.hitWordLetter(tf.text);
+                    tf.parent.removeChild(tf);
+                }
             }
         }
     };
     Games.prototype.hitWordLetter = function (text) {
+        var myDate = new Date(); //获取系统当前时间
+        console.log(myDate.toLocaleTimeString() + " ----+++++ " + this._wordIndex);
         if (text == this._missLetter) {
             this._wordTextField.text = this._wordTextField.text.replace("( )", "(" + text + ")");
-            this._isSpeedUp = true;
-            this._baseSpeed = 1.5;
-            var speed = egret.setTimeout(function (param) {
-                this._isSpeedUp = false;
-                this._baseSpeed = 1;
-                if (this._wordIndex < this._wordsArray.length - 1) {
-                    this._wordIndex++;
-                    this.updataWord();
-                }
-            }, this, 2000, "param");
+            this._wordIndex++;
+            console.log(myDate.toLocaleTimeString() + " ---- " + this._wordIndex);
+            this.updataWord();
+            if (this._wordIndex < this._wordsArray.length - 1) {
+                this._isSpeedUp = true;
+                this._baseSpeed = 1.5;
+                var speed = egret.setTimeout(function (param) {
+                    this._isSpeedUp = false;
+                    this._baseSpeed = 1;
+                }, this, 2000, "param");
+            }
         }
     };
     //游戏结束
@@ -389,21 +418,9 @@ var Games = (function (_super) {
             this._backgroundChannel.stop();
         // // this.gameOver();
         // //test
-        // this._normalAlert = new Alert(Alert.GamePageScore, "999", "1000", "1", 0,this._stageW,this._stageH);
-        // this._normalAlert.addEventListener(AlertEvent.Restart, this.restart, this);
-        // this.addChild(this._normalAlert);
-    };
-    Games.prototype.restart = function () {
-        this.removeChildren();
-        this._barrierArray1.splice(0, this._barrierArray1.length);
-        this._barrierArray2.splice(0, this._barrierArray2.length);
-        this._moveToRight = true; //小球是否在向右移动
-        this._ballMoveSpeed = 8; //小球移动速度
-        this._bgMoveSpeed = 10; //背景移动速度
-        this._baseSpeed = 1; //速度系数,加速时增加
-        this._isSpeedUp = false; //是否加速
-        this._isFitstApperar = true;
-        this.setupViews();
+        this._normalAlert = new Alert(Alert.GamePageScore, "999", "1000", "1", 0, this._stageW, this._stageH);
+        this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
+        this.addChild(this._normalAlert);
     };
     //接口-减游戏次数
     Games.prototype.minusGameCount = function () {
@@ -420,6 +437,7 @@ var Games = (function (_super) {
             var result = JSON.parse(request.response);
             if (result["code"] == 0) {
                 //减次数成功
+                this.setupViews();
             }
             else if (result["code"] == 2) {
                 var _overAlert = new Alert(Alert.GamePageShare, "", "", "", 0, this._stageW, this._stageH);
@@ -437,7 +455,7 @@ var Games = (function (_super) {
             alert("numdown5　post error : " + event);
         }, this);
     };
-    //接口-请求单词, 只在初次请求时添加UI
+    //接口-请求单词
     Games.prototype.getWords = function (type) {
         var params = "?vuid=" + this._info._vuid +
             "&key=" + this._info._key +
@@ -515,14 +533,6 @@ var Games = (function (_super) {
             this._normalAlert.parent.removeChild(this._normalAlert);
         }
         window.location.href = this._info._rankUrl + this._info._timenum + "/activitynum/" + this._info._activitynum + "/vuid/" + this._info._vuid + "/key/" + this._info._key + "/isfrom/" + this._info._isfrom;
-    };
-    //游戏结束alert-重玩
-    Games.prototype.restartGame = function () {
-        //移动当前场景
-        this.removeChildren();
-        //重玩时清空数组
-        //重新初始化赋值参数
-        this.minusGameCount();
     };
     Games.prototype.shareButtonClick = function () {
         //分享引导图

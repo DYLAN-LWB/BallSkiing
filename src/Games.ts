@@ -1,7 +1,7 @@
 class Games extends egret.DisplayObjectContainer {
 	public constructor() {
 		super();
-        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.createGameScene, this);
+        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.restartGame, this);
 	}
 
 	//public
@@ -17,7 +17,7 @@ class Games extends egret.DisplayObjectContainer {
 
 	private _ball = new Bitmap("person_png");	//小球
 	private _moveToRight:boolean = true;	//小球是否在向右移动
-	private _ballMoveSpeed = 8;	//小球移动速度
+	private _ballMoveSpeed = 10;	//小球移动速度
 	private _bgMoveSpeed = 10;	//背景移动速度
 	private _baseSpeed = 1;		//速度系数,加速时增加
 	private _isSpeedUp:boolean = false;	//是否加速
@@ -40,29 +40,50 @@ class Games extends egret.DisplayObjectContainer {
 	private _wordIndex = 0;	//当前是第几个单词
 	private _wordTextField;		//显示的单词
 	private _translateTextField;	//显示的翻译
-	private _missLetter;//
+	private _missLetter;	//单词缺的字母
+
+	private restartGame() {
+		this.removeChildren();
+
+		this._barrierArray1.splice(0, this._barrierArray1.length);
+		this._barrierArray2.splice(0, this._barrierArray2.length);
+		this._letterTFArray1.splice(0, this._letterTFArray1.length);
+		this._letterTFArray2.splice(0, this._letterTFArray2.length);
+
+		this._moveToRight = true;	
+		this._ballMoveSpeed = 10;
+		this._bgMoveSpeed = 10;
+		this._baseSpeed = 1;		
+		this._isSpeedUp = false;	
+		this._isFitstApperar = true;
+		this._wordIndex = 0;
+		
+		// this.minusGameCount();
+		this.createGameScene();
+	}
 
 	private createGameScene() {
 		this._stageW = this.stage.stageWidth;
 		this._stageH = this.stage.stageHeight;
 
 		this._wordsArray = [
-			{
-				"word":"Mondy",
-				"chinese":"周一"
-			},
-			{
-				"word":"Tuesday",
-				"chinese":"周二"
-			},
-			{
-				"word":"Wednesday",
-				"chinese":"周三"
-			},
-			{
-				"word":"Thursday",
-				"chinese":"周四"
-			}];
+			{ "word":"Mondy", "chinese":"周一" },
+			{ "word":"Tuesday", "chinese":"周二" },
+			{ "word":"Wednesday", "chinese":"周三" },
+			{ "word":"Thursday", "chinese":"周四" },
+			{ "word":"Mondy", "chinese":"周一" },
+			{ "word":"Tuesday", "chinese":"周二" },
+			{ "word":"Wednesday", "chinese":"周三" },
+			{ "word":"Thursday", "chinese":"周四" },
+			{ "word":"Mondy", "chinese":"周一" },
+			{ "word":"Tuesday", "chinese":"周二" },
+			{ "word":"Wednesday", "chinese":"周三" },
+			{ "word":"Thursday", "chinese":"周四" },
+			{ "word":"Mondy", "chinese":"周一" },
+			{ "word":"Tuesday", "chinese":"周二" },
+			{ "word":"Wednesday", "chinese":"周三" },
+			{ "word":"Thursday", "chinese":"周四" }
+			];
 		this.setupViews();
 	}
 
@@ -162,21 +183,21 @@ class Games extends egret.DisplayObjectContainer {
 
 	//更新单词
 	private updataWord() {
-		
 		let word = this._wordsArray[this._wordIndex]["word"];
 		let location = Math.floor(Math.random()*word.length);
 		this._missLetter = word.slice(location,location+1);
 		word = word.replace(this._missLetter,"( )");
 		this._wordTextField.text = word;
-		this._translateTextField.text = this._wordsArray[this._wordIndex]["chinese"]
-
+		this._translateTextField.text = this._wordsArray[this._wordIndex]["chinese"];
 	}
 
 	private addBarriers(page) {
 		if(page == 1) {
 			this._barrierArray1.splice(0, this._barrierArray1.length);
+			this._letterTFArray1.splice(0, this._letterTFArray1.length);
 		} else {
 			this._barrierArray2.splice(0, this._barrierArray2.length);
+			this._letterTFArray2.splice(0, this._letterTFArray2.length);
 		}
 
 		for(var i = 0; i < ((this._isFitstApperar ? 2 : 5)+Math.random()*5); i++) {
@@ -226,7 +247,7 @@ class Games extends egret.DisplayObjectContainer {
 			letter.backgroundColor = 0x545454;
 			letter.verticalAlign = egret.VerticalAlign.MIDDLE;
 			letter.textAlign = egret.HorizontalAlign.CENTER;
-			letter.size = 25;
+			letter.size = 30;
 			letter.text = randomLetter[l];
 			letter.fontFamily = "Microsoft YaHei";
 			letter.text = randomLetter[l];
@@ -237,7 +258,6 @@ class Games extends egret.DisplayObjectContainer {
 				this._gameBg2.addChild(letter);
 				this._letterTFArray2.push(letter);
 			}
-
 		}
 	}
 
@@ -319,7 +339,7 @@ class Games extends egret.DisplayObjectContainer {
 				maxWidth = this._locusW;
 			}
 			var point = this._locusPointAaray[i]["object"];	// 红 0xEBBCB5
-			point.graphics.lineStyle(maxWidth, this._isSpeedUp ? 0xEBBCB5 : 0xCDE3E2, 1, true);
+			point.graphics.lineStyle(maxWidth, this._isSpeedUp ? 0xCDE3E2 : 0xCDE3E2, 1, true);
 			point.graphics.moveTo(this._locusPointAaray[i]["beginX"], this._locusPointAaray[i]["beginY"]);
 			point.graphics.lineTo(this._locusPointAaray[i]["endX"] , this._locusPointAaray[i]["endY"]);
 		}
@@ -334,7 +354,7 @@ class Games extends egret.DisplayObjectContainer {
  
 	//点击屏幕
 	private touchBegin(event: egret.TouchEvent) {
-		var bufferTimer: egret.Timer = new egret.Timer(10, 20);
+		var bufferTimer: egret.Timer = new egret.Timer(5, 20);
         bufferTimer.addEventListener(egret.TimerEvent.TIMER, this.bufferTimerFunc, this);
         bufferTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, this.bufferTimerComFunc, this);
         bufferTimer.start();
@@ -360,15 +380,15 @@ class Games extends egret.DisplayObjectContainer {
 		this._moveToRight = !this._moveToRight;
 
         this._ballMoveSpeed = 0;
-		var timer: egret.Timer = new egret.Timer(10, 20);
+		var timer: egret.Timer = new egret.Timer(5, 20);
         timer.addEventListener(egret.TimerEvent.TIMER, this.timerFunc, this);
         timer.start();
     }
 	//加速
 	private timerFunc(event:egret.TimerEvent) {
         this._ballMoveSpeed += 0.5;
-		if(this._ballMoveSpeed > 15) {
-			this._ballMoveSpeed = 15;
+		if(this._ballMoveSpeed > 10) {
+			this._ballMoveSpeed = 10;
 		}
     }
 
@@ -394,7 +414,11 @@ class Games extends egret.DisplayObjectContainer {
 			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
 			if(_isHit) {
 				var tf = this._letterTFArray1[index];
-				this.hitWordLetter(tf.text);
+				console.log(tf);
+				if(tf && tf.parent) {
+					this.hitWordLetter(tf.text);
+					tf.parent.removeChild(tf);
+				}
 			} 
 		}
 		for(let index = 0; index < this._letterTFArray2.length; index++) {
@@ -402,16 +426,25 @@ class Games extends egret.DisplayObjectContainer {
 			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
 			if(_isHit) {
 				var tf = this._letterTFArray2[index];
-				this.hitWordLetter(tf.text);
+				console.log(tf);
+				if(tf && tf.parent) {
+					this.hitWordLetter(tf.text);
+					tf.parent.removeChild(tf);
+				}
 			} 
 		}
 	}
 
 	private hitWordLetter(text) {
+
+		var myDate = new Date();//获取系统当前时间
+		console.log(myDate.toLocaleTimeString() + " ----+++++ " + this._wordIndex);
+
 		if(text == this._missLetter) {
-
 			this._wordTextField.text = this._wordTextField.text.replace("( )","("+ text + ")");
-
+			this._wordIndex++;
+			console.log(myDate.toLocaleTimeString() + " ---- " + this._wordIndex);
+			this.updataWord();	
 			if(this._wordIndex < this._wordsArray.length-1) {
 				this._isSpeedUp = true;
 				this._baseSpeed = 1.5;
@@ -419,8 +452,7 @@ class Games extends egret.DisplayObjectContainer {
 					
 					this._isSpeedUp = false;
 					this._baseSpeed = 1;
-					this._wordIndex++;
-					this.updataWord();				
+								
 				}, this, 2000, "param");
 			}
 		}
@@ -435,25 +467,11 @@ class Games extends egret.DisplayObjectContainer {
 		// // this.gameOver();
 		// //test
 		this._normalAlert = new Alert(Alert.GamePageScore, "999", "1000", "1", 0,this._stageW,this._stageH);
-		this._normalAlert.addEventListener(AlertEvent.Restart, this.restart, this);
+		this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
 		this.addChild(this._normalAlert);
 	}
-	private restart() {
-		this.removeChildren();
 
-		this._barrierArray1.splice(0, this._barrierArray1.length);
-		this._barrierArray2.splice(0, this._barrierArray2.length);
-
-		this._moveToRight = true;	//小球是否在向右移动
-		this._ballMoveSpeed = 8;	//小球移动速度
-		this._bgMoveSpeed = 10;	//背景移动速度
-		this._baseSpeed = 1;		//速度系数,加速时增加
-		this._isSpeedUp = false;	//是否加速
-		this._isFitstApperar = true;
-		this.setupViews();
-	}
-
-	//接口-减游戏次数
+//接口-减游戏次数
 	private minusGameCount() {
 		let params = "?vuid=" + this._info._vuid +
 					 "&key=" + this._info._key +
@@ -468,6 +486,7 @@ class Games extends egret.DisplayObjectContainer {
 			let result = JSON.parse(request.response);
             if (result["code"] == 0) {
 				//减次数成功
+				this.setupViews();
 				
 			} else if(result["code"] == 2) {
 
@@ -486,7 +505,7 @@ class Games extends egret.DisplayObjectContainer {
         }, this);
 	}
 
-	//接口-请求单词, 只在初次请求时添加UI
+	//接口-请求单词
 	private getWords(type: number) {
 		let params = "?vuid=" + this._info._vuid + 
 					 "&key=" + this._info._key +
@@ -572,20 +591,6 @@ class Games extends egret.DisplayObjectContainer {
         window.location.href = this._info._rankUrl + this._info._timenum + "/activitynum/" + this._info._activitynum + "/vuid/" + this._info._vuid + "/key/" + this._info._key + "/isfrom/" + this._info._isfrom;
     }
 
-	//游戏结束alert-重玩
-    private restartGame() {
-
-		//移动当前场景
-        this.removeChildren();
-
-		//重玩时清空数组
-
-
-		//重新初始化赋值参数
-
-
-		this.minusGameCount();
-    }
 
 	private shareButtonClick() {
         //分享引导图

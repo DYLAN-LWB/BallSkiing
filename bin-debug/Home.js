@@ -53,7 +53,7 @@ var Home = (function (_super) {
     };
     Home.prototype.getUserInfo = function () {
         //test app url
-        this._pageUrl = "http://ceshi.beisu100.com//actity/11/index.html?uid=3&key=1241ea11b7f3b5bf852b3bbc428ef209&isfrom=1&activitynum=11&timenum=1";
+        this._pageUrl = "http://ceshi.beisu100.com/actity/14/index.html?uid=239&key=025c36913a73938ca487974c2658e52f&isfrom=1&activitynum=11&timenum=1";
         // alert("this._pageUrl = " + this._pageUrl);
         //解析url参数
         var params = this.getUrlParams();
@@ -90,6 +90,7 @@ var Home = (function (_super) {
     };
     //获取用户剩余挑战次数
     Home.prototype.getNumberOfGames = function () {
+        console.log("getNumberOfGames");
         var params = "?vuid=" + this._info._vuid +
             "&key=" + this._info._key +
             "&timenum=" + this._info._timenum +
@@ -142,6 +143,7 @@ var Home = (function (_super) {
         introduce.anchorOffsetX = introduce.width / 2;
         introduce.anchorOffsetY = introduce.height / 2;
         introduce.rotation = this._isPortraitScreen ? 0 : -90;
+        introduce.textColor = 0xff0000;
         this.addChild(introduce);
         //剩余挑战机会
         this._playNumText = new egret.TextField();
@@ -155,7 +157,7 @@ var Home = (function (_super) {
         this._playNumText.text = "您当前有0次挑战机会";
         this.addChild(this._playNumText);
         //开始游戏按钮
-        this._startButton = new Bitmap("startgame_png");
+        this._startButton = new Bitmap("gamebody_json.start");
         this._startButton.x = this._isPortraitScreen ? 180 : 700;
         this._startButton.y = this._isPortraitScreen ? 700 : 570;
         this._startButton.rotation = this._isPortraitScreen ? 0 : -90;
@@ -163,7 +165,7 @@ var Home = (function (_super) {
         this._startButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.startPlayGame, this);
         this.addChild(this._startButton);
         //查看排名按钮
-        this._rankButton = new Bitmap("ranking_png");
+        this._rankButton = new Bitmap("gamebody_json.ranking");
         this._rankButton.x = this._isPortraitScreen ? 180 : 850;
         this._rankButton.y = this._isPortraitScreen ? 850 : 570;
         this._rankButton.rotation = this._isPortraitScreen ? 0 : -90;
