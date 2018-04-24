@@ -130,6 +130,18 @@ var Games = (function (_super) {
         this._gameBg2.width = this._stageW;
         this._gameBg2.height = this._stageH;
         this.addChild(this._gameBg2);
+        this._gameBg11 = new egret.Sprite();
+        this._gameBg11.x = 0;
+        this._gameBg11.y = 0;
+        this._gameBg11.width = this._stageW;
+        this._gameBg11.height = this._stageH;
+        this.addChild(this._gameBg11);
+        this._gameBg22 = new egret.Sprite();
+        this._gameBg22.x = 0;
+        this._gameBg22.y = 0;
+        this._gameBg22.width = this._stageW;
+        this._gameBg22.height = this._stageH;
+        this.addChild(this._gameBg22);
         //背景添加对象
         this.addBarriers(1);
         this._isFitstApperar = false;
@@ -156,14 +168,14 @@ var Games = (function (_super) {
             this._barrierArray2.splice(0, this._barrierArray2.length);
             this._letterBgArray2.splice(0, this._letterBgArray2.length);
         }
-        for (var i = 0; i < ((this._isFitstApperar ? 1 : 3) + Math.random() * 3); i++) {
+        for (var i = 0; i < ((this._isFitstApperar ? 2 : 5) + Math.random() * 3); i++) {
             //背景
             var treeBg = new egret.Sprite;
             treeBg.x = Math.random() * (this._stageW - 80);
             treeBg.y = Math.random() * (this._stageH - 80 - (this._isFitstApperar ? 700 : 0)) + (this._isFitstApperar ? 700 : 0);
             treeBg.width = 80;
             treeBg.height = 80;
-            //🌲
+            //树
             var treeImg = new Bitmap("tree_png");
             treeImg.x = 0;
             treeImg.y = 0;
@@ -184,11 +196,11 @@ var Games = (function (_super) {
             hitObject.name = "hit";
             treeBg.addChild(hitObject);
             if (page == 1) {
-                this._gameBg1.addChild(treeBg);
+                this._gameBg11.addChild(treeBg);
                 this._barrierArray1.push(treeBg);
             }
             else {
-                this._gameBg2.addChild(treeBg);
+                this._gameBg22.addChild(treeBg);
                 this._barrierArray2.push(treeBg);
             }
         }
@@ -229,16 +241,22 @@ var Games = (function (_super) {
         //移动游戏背景
         this._gameBg1.y -= this._bgMoveSpeed * this._baseSpeed;
         this._gameBg2.y -= this._bgMoveSpeed * this._baseSpeed;
+        this._gameBg11.y = this._gameBg1.y;
+        this._gameBg22.y = this._gameBg2.y;
         //重新设置背景位置,清空子视图
         if (this._gameBg1.y <= -this._stageH) {
             this._gameBg1.removeChildren();
+            this._gameBg11.removeChildren();
             this._gameBg1.y = this._gameBg2.y + this._stageH;
+            this._gameBg11.y = this._gameBg1.y;
             this._locusPointAaray.splice(0, this._locusPointAaray.length);
             this.addBarriers(1);
         }
         if (this._gameBg2.y <= -this._stageH) {
             this._gameBg2.removeChildren();
+            this._gameBg22.removeChildren();
             this._gameBg2.y = this._gameBg1.y + this._stageH;
+            this._gameBg22.y = this._gameBg2.y;
             this._locusPointAaray.splice(0, this._locusPointAaray.length);
             this.addBarriers(2);
         }
@@ -256,14 +274,14 @@ var Games = (function (_super) {
         //跨背景图时特殊处理
         // console.log("line from= " + this._lastLocusPointY + " ----to " + (currentLocusPointY));
         if (this._lastLocusPointY >= (this._stageH - this._bgMoveSpeed * this._baseSpeed)) {
-            this._lastLocusPointY = (currentLocusPointY) - this._bgMoveSpeed * this._baseSpeed;
+            this._lastLocusPointY = currentLocusPointY - this._bgMoveSpeed * this._baseSpeed;
         }
         //保存对象,起点,终点
         var dict = {
             "beginX": this._lastLocusPointX,
             "beginY": this._lastLocusPointY,
             "endX": this._ball.x,
-            "endY": (currentLocusPointY),
+            "endY": currentLocusPointY,
             "object": locusPoint,
         };
         this._locusPointAaray.reverse();

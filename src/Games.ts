@@ -32,6 +32,8 @@ class Games extends egret.DisplayObjectContainer {
 
 	private _gameBg1;	//背景1
 	private _gameBg2;	//背景2
+	private _gameBg11;	//背景1
+	private _gameBg22;	//背景2
 	private _barrierArray1 = [];	//障碍物数组
 	private _barrierArray2 = [];	//障碍物数组
 	private _letterBgArray1 = [];	//字符数组
@@ -140,7 +142,7 @@ class Games extends egret.DisplayObjectContainer {
 		this._gameBg1.width = this._stageW;
 		this._gameBg1.height = this._stageH;
         this.addChild(this._gameBg1);
-		
+
 		//添加背景2
 		this._gameBg2 = new egret.Sprite();
 		this._gameBg2.x = 0;
@@ -148,6 +150,20 @@ class Games extends egret.DisplayObjectContainer {
 		this._gameBg2.width = this._stageW;
 		this._gameBg2.height = this._stageH;
         this.addChild(this._gameBg2);
+
+		this._gameBg11 = new egret.Sprite();
+		this._gameBg11.x = 0;
+		this._gameBg11.y = 0;
+		this._gameBg11.width = this._stageW;
+		this._gameBg11.height = this._stageH;
+        this.addChild(this._gameBg11);
+
+		this._gameBg22 = new egret.Sprite();
+		this._gameBg22.x = 0;
+		this._gameBg22.y = 0;
+		this._gameBg22.width = this._stageW;
+		this._gameBg22.height = this._stageH;
+        this.addChild(this._gameBg22);
 		
 		//背景添加对象
 		this.addBarriers(1);
@@ -178,7 +194,7 @@ class Games extends egret.DisplayObjectContainer {
 			this._letterBgArray2.splice(0, this._letterBgArray2.length);
 		}
 
-		for(var i = 0; i < ((this._isFitstApperar ? 1 : 3)+Math.random()*3); i++) {
+		for(var i = 0; i < ((this._isFitstApperar ? 2 : 5)+Math.random()*3); i++) {
 
 			//背景
 			let treeBg = new egret.Sprite;
@@ -210,10 +226,10 @@ class Games extends egret.DisplayObjectContainer {
 			treeBg.addChild(hitObject);
 
 			if(page == 1) {
-				this._gameBg1.addChild(treeBg);
+				this._gameBg11.addChild(treeBg);
 				this._barrierArray1.push(treeBg);
 			} else {
-				this._gameBg2.addChild(treeBg);
+				this._gameBg22.addChild(treeBg);
 				this._barrierArray2.push(treeBg);
 			}
 		}
@@ -260,18 +276,24 @@ class Games extends egret.DisplayObjectContainer {
 		//移动游戏背景
 		this._gameBg1.y -= this._bgMoveSpeed*this._baseSpeed;
 		this._gameBg2.y -= this._bgMoveSpeed*this._baseSpeed;
+		this._gameBg11.y = this._gameBg1.y;
+		this._gameBg22.y = this._gameBg2.y;
 
 		//重新设置背景位置,清空子视图
 		if (this._gameBg1.y <= -this._stageH) {
 			this._gameBg1.removeChildren();
+			this._gameBg11.removeChildren();
 			this._gameBg1.y = this._gameBg2.y + this._stageH;
+			this._gameBg11.y = this._gameBg1.y;
 			this._locusPointAaray.splice(0, this._locusPointAaray.length);
 			this.addBarriers(1);
 		}
 
 		if (this._gameBg2.y <= -this._stageH) {
 			this._gameBg2.removeChildren();
+			this._gameBg22.removeChildren();
 			this._gameBg2.y = this._gameBg1.y  + this._stageH;
+			this._gameBg22.y = this._gameBg2.y;
 			this._locusPointAaray.splice(0, this._locusPointAaray.length);
 			this.addBarriers(2);
 		}
