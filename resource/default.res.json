@@ -1,7 +1,7 @@
 {
 	"groups": [
 		{
-			"keys": "description_json,countdown_mp3,bg_mp3,rocket_mp3,eat_mp3,monster_png,guide_png,guide_json,gamebody_json,person_png",
+			"keys": "description_json,countdown_mp3,bg_mp3,rocket_mp3,eat_mp3,guide_png,guide_json,gamebody_json,Eword_json,ball_png,tree_png",
 			"name": "preload"
 		}
 	],
@@ -38,16 +38,6 @@
 			"subkeys": "balloon,beibei,btn_03,btn_05,di,drawboard,ending,list,prompt_03,quicken,ranking,return,start,tan,title,yun01,yun02,yun03,yun04"
 		},
 		{
-			"url": "http://beisu-js.oss-cn-beijing.aliyuncs.com/game/ball/person.png",
-			"type": "image",
-			"name": "person_png"
-		},
-		{
-			"url": "http://beisu-js.oss-cn-beijing.aliyuncs.com/game/ball/monster.png",
-			"type": "image",
-			"name": "monster_png"
-		},
-		{
 			"url": "http://beisuapp.oss-cn-beijing.aliyuncs.com/uploads/game/1101/guide.png",
 			"type": "image",
 			"name": "guide_png"
@@ -62,6 +52,22 @@
 			"type": "sheet",
 			"name": "gamebody_json",
 			"subkeys": "balloon,beibei,btn_03,btn_05,di,drawboard,ending,list,prompt_03,quicken,ranking,return,start,tan,title,yun01,yun02,yun03,yun04"
+		},
+		{
+			"name": "Eword_json",
+			"type": "sheet",
+			"url": "game/Eword.json",
+			"subkeys": "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z"
+		},
+		{
+			"name": "ball_png",
+			"type": "image",
+			"url": "game/ball.png"
+		},
+		{
+			"name": "tree_png",
+			"type": "image",
+			"url": "game/tree.png"
 		}
 	]
 }

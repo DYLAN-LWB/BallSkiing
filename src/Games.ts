@@ -15,7 +15,7 @@ class Games extends egret.DisplayObjectContainer {
 	private _stageH;	//舞台高度
 	private _backgroundChannel: egret.SoundChannel;	//游戏背景音乐
 
-	private _ball = new Bitmap("person_png");	//小球
+	private _ball = new Bitmap("ball_png");	//小球
 	private _moveToRight:boolean = true;	//小球是否在向右移动
 	private _ballMoveSpeed = 10;	//小球移动速度
 	private _bgMoveSpeed = 10;	//背景移动速度
@@ -33,8 +33,8 @@ class Games extends egret.DisplayObjectContainer {
 	private _gameBg2;	//背景2
 	private _barrierArray1 = [];	//障碍物数组
 	private _barrierArray2 = [];	//障碍物数组
-	private _letterTFArray1 = [];	//字符数组
-	private _letterTFArray2 = [];	//字符数组
+	private _letterBgArray1 = [];	//字符数组
+	private _letterBgArray2 = [];	//字符数组
 
 	private _wordsArray = [];	//单词数组
 	private _wordIndex = 0;	//当前是第几个单词
@@ -47,8 +47,8 @@ class Games extends egret.DisplayObjectContainer {
 
 		this._barrierArray1.splice(0, this._barrierArray1.length);
 		this._barrierArray2.splice(0, this._barrierArray2.length);
-		this._letterTFArray1.splice(0, this._letterTFArray1.length);
-		this._letterTFArray2.splice(0, this._letterTFArray2.length);
+		this._letterBgArray1.splice(0, this._letterBgArray1.length);
+		this._letterBgArray2.splice(0, this._letterBgArray2.length);
 
 		this._moveToRight = true;	
 		this._ballMoveSpeed = 10;
@@ -107,7 +107,7 @@ class Games extends egret.DisplayObjectContainer {
 		_gameBg.y = 0;
 		_gameBg.width = this._stageW;
 		_gameBg.height = this._stageH;
-		_gameBg.graphics.beginFill(0xFFF8F5);
+		_gameBg.graphics.beginFill(0xffffff);
         _gameBg.graphics.drawRect(0, 0, _gameBg.width, _gameBg.height);
         _gameBg.graphics.endFill();
         this.addChild(_gameBg);
@@ -115,8 +115,8 @@ class Games extends egret.DisplayObjectContainer {
 		//添加小球
 		this._ball.x = this._stageW/2;
 		this._ball.y = 400;
-		this._ball.width = 40;
-		this._ball.height = 40;
+		this._ball.width = 30;
+		this._ball.height = 30;
 		this.addChild(this._ball);
 		
 		this._guide = new Movie();
@@ -194,10 +194,10 @@ class Games extends egret.DisplayObjectContainer {
 	private addBarriers(page) {
 		if(page == 1) {
 			this._barrierArray1.splice(0, this._barrierArray1.length);
-			this._letterTFArray1.splice(0, this._letterTFArray1.length);
+			this._letterBgArray1.splice(0, this._letterBgArray1.length);
 		} else {
 			this._barrierArray2.splice(0, this._barrierArray2.length);
-			this._letterTFArray2.splice(0, this._letterTFArray2.length);
+			this._letterBgArray2.splice(0, this._letterBgArray2.length);
 		}
 
 		for(var i = 0; i < ((this._isFitstApperar ? 2 : 5)+Math.random()*5); i++) {
@@ -206,19 +206,18 @@ class Games extends egret.DisplayObjectContainer {
 			let barrierBg = new egret.Sprite;
 			barrierBg.x = Math.random()*(this._stageW-80);
 			barrierBg.y = Math.random()*(this._stageH-80-(this._isFitstApperar ? 700 : 0)) + (this._isFitstApperar ? 700 : 0);
-			barrierBg.width = 50;
-			barrierBg.height = 50;
-			barrierBg.graphics.beginFill(0xFF0000,0.01);
-			barrierBg.graphics.drawCircle(20, 20, 20);
-			barrierBg.graphics.endFill();
+			barrierBg.width = 80;
+			barrierBg.height = 80;
 
 			//障碍物
-			let barrier  = new Bitmap("monster_png");
-			barrier.x = 10;
-			barrier.y = 10;
-			barrier.width = 30;
-			barrier.height = 30;
+			let barrier  = new Bitmap("tree_png");
+			barrier.x = 0;
+			barrier.y = 0;
+			barrier.width = 80;
+			barrier.height = 80;
 			barrierBg.addChild(barrier);
+
+			
 
 			if(page == 1) {
 				this._gameBg1.addChild(barrierBg);
@@ -238,25 +237,22 @@ class Games extends egret.DisplayObjectContainer {
 		randomLetter.push(this._missLetter);
 
 		for(var l = 0; l < randomLetter.length; l++) {
-			let letter  = new egret.TextField;
-			letter.x = Math.random()*(this._stageW-80);
-			letter.y = Math.random()*(this._stageH-80-(this._isFitstApperar ? 700 : 0)) + (this._isFitstApperar ? 700 : 0);
-			letter.width = 50;
-			letter.height = 50;
-			letter.textColor = 0xFF0000;
-			letter.backgroundColor = 0x545454;
-			letter.verticalAlign = egret.VerticalAlign.MIDDLE;
-			letter.textAlign = egret.HorizontalAlign.CENTER;
-			letter.size = 30;
-			letter.text = randomLetter[l];
-			letter.fontFamily = "Microsoft YaHei";
-			letter.text = randomLetter[l];
+
+			let letImg = new Bitmap("Eword_json."+randomLetter[l]);
+			letImg.width = 50;
+			letImg.height = 50;
+			letImg.anchorOffsetX = letImg.width/2;
+			letImg.anchorOffsetY = letImg.height/2;
+			letImg.x = Math.random()*(this._stageW-80);
+			letImg.y = Math.random()*(this._stageH-80-(this._isFitstApperar ? 700 : 0)) + (this._isFitstApperar ? 700 : 0);
+			letImg['name'] = randomLetter[l];
+
 			if(page == 1) {
-				this._gameBg1.addChild(letter);
-				this._letterTFArray1.push(letter);
+				this._gameBg1.addChild(letImg);
+				this._letterBgArray1.push(letImg);
 			} else {
-				this._gameBg2.addChild(letter);
-				this._letterTFArray2.push(letter);
+				this._gameBg2.addChild(letImg);
+				this._letterBgArray2.push(letImg);
 			}
 		}
 	}
@@ -339,7 +335,7 @@ class Games extends egret.DisplayObjectContainer {
 				maxWidth = this._locusW;
 			}
 			var point = this._locusPointAaray[i]["object"];	// 红 0xEBBCB5
-			point.graphics.lineStyle(maxWidth, this._isSpeedUp ? 0xCDE3E2 : 0xCDE3E2, 1, true);
+			point.graphics.lineStyle(maxWidth, this._isSpeedUp ? 0x7ed7de : 0x7ed7de, 1, true);
 			point.graphics.moveTo(this._locusPointAaray[i]["beginX"], this._locusPointAaray[i]["beginY"]);
 			point.graphics.lineTo(this._locusPointAaray[i]["endX"] , this._locusPointAaray[i]["endY"]);
 		}
@@ -409,53 +405,53 @@ class Games extends egret.DisplayObjectContainer {
 			} 
 		}
 
-		for(let index = 0; index < this._letterTFArray1.length; index++) {
-			let bar = this._letterTFArray1[index];
+		for(let index = 0; index < this._letterBgArray1.length; index++) {
+			let bar = this._letterBgArray1[index];
 			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
 			if(_isHit) {
-				var tf = this._letterTFArray1[index];
-				console.log(tf);
+				var tf = this._letterBgArray1[index];
 				if(tf && tf.parent) {
-					this.hitWordLetter(tf.text);
+					this.hitWordLetter(tf);
 					tf.parent.removeChild(tf);
 				}
 			} 
 		}
-		for(let index = 0; index < this._letterTFArray2.length; index++) {
-			let bar = this._letterTFArray2[index];
+		for(let index = 0; index < this._letterBgArray2.length; index++) {
+			let bar = this._letterBgArray2[index];
 			let _isHit: boolean = bar.hitTestPoint(this._ball.x+this._ball.width/2, this._ball.y+this._ball.height);
 			if(_isHit) {
-				var tf = this._letterTFArray2[index];
-				console.log(tf);
+				var tf = this._letterBgArray2[index];
 				if(tf && tf.parent) {
-					this.hitWordLetter(tf.text);
+					this.hitWordLetter(tf);
 					tf.parent.removeChild(tf);
 				}
 			} 
 		}
 	}
 
-	private hitWordLetter(text) {
+	private hitWordLetter(tf) {
+		console.log(tf["name"]);
+		// console.log(tf.getChildAt(1).text);
 
-		var myDate = new Date();//获取系统当前时间
-		console.log(myDate.toLocaleTimeString() + " ----+++++ " + this._wordIndex);
+		// var myDate = new Date();//获取系统当前时间
+		// console.log(myDate.toLocaleTimeString() + " ----+++++ " + this._wordIndex);
 
-		if(text == this._missLetter) {
-			this._wordTextField.text = this._wordTextField.text.replace("( )","("+ text + ")");
-			this._wordIndex++;
-			console.log(myDate.toLocaleTimeString() + " ---- " + this._wordIndex);
-			this.updataWord();	
-			if(this._wordIndex < this._wordsArray.length-1) {
-				this._isSpeedUp = true;
-				this._baseSpeed = 1.5;
-				var speed:number = egret.setTimeout(function(param){
+		// if(text == this._missLetter) {
+		// 	this._wordTextField.text = this._wordTextField.text.replace("( )","("+ text + ")");
+		// 	this._wordIndex++;
+		// 	console.log(myDate.toLocaleTimeString() + " ---- " + this._wordIndex);
+		// 	this.updataWord();	
+		// 	if(this._wordIndex < this._wordsArray.length-1) {
+		// 		this._isSpeedUp = true;
+		// 		this._baseSpeed = 1.5;
+		// 		var speed:number = egret.setTimeout(function(param){
 					
-					this._isSpeedUp = false;
-					this._baseSpeed = 1;
+		// 			this._isSpeedUp = false;
+		// 			this._baseSpeed = 1;
 								
-				}, this, 2000, "param");
-			}
-		}
+		// 		}, this, 2000, "param");
+		// 	}
+		// }
 	}
 
 	//游戏结束
