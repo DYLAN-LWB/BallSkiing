@@ -43,7 +43,6 @@ class Games extends egret.DisplayObjectContainer {
 	private _randomTreeNum = 5;
 
 	private _wordsArray = [];	//单词数组
-	private _wordIndex = 0;	//当前是第几个单词
 	private _wordTextField;		//显示的单词
 	private _translateTextField;	//显示的翻译
 	private _missLetter;	//单词缺的字母
@@ -54,27 +53,8 @@ class Games extends egret.DisplayObjectContainer {
 		this._stageW = this.stage.stageWidth;
 		this._stageH = this.stage.stageHeight;
 
-		this._wordsArray = [
-			{ "word":"Mondy", "chinese":"周一" },
-			{ "word":"Tuesday", "chinese":"周二" },
-			{ "word":"Wednesday", "chinese":"周三" },
-			{ "word":"Thursday", "chinese":"周四" },
-			{ "word":"Mondy", "chinese":"周一" },
-			{ "word":"Tuesday", "chinese":"周二" },
-			{ "word":"Wednesday", "chinese":"周三" },
-			{ "word":"Thursday", "chinese":"周四" },
-			{ "word":"Mondy", "chinese":"周一" },
-			{ "word":"Tuesday", "chinese":"周二" },
-			{ "word":"Wednesday", "chinese":"周三" },
-			{ "word":"Thursday", "chinese":"周四" },
-			{ "word":"Mondy", "chinese":"周一" },
-			{ "word":"Tuesday", "chinese":"周二" },
-			{ "word":"Wednesday", "chinese":"周三" },
-			{ "word":"Thursday", "chinese":"周四" }
-			];
-
 		//test	
-		this.setupViews();
+		this.getWords(1);
 	}
 
 	private setupViews() {
@@ -152,11 +132,11 @@ class Games extends egret.DisplayObjectContainer {
 		this._translateTextField.x = 0;
 		this._translateTextField.y = 80;
 		this._translateTextField.width = this._stageW/2;
-		this._translateTextField.height = 50;
+		this._translateTextField.height = 100;
 		this._translateTextField.textColor = 0xffa340;
-		this._translateTextField.verticalAlign = egret.VerticalAlign.MIDDLE;
+		this._translateTextField.verticalAlign = egret.VerticalAlign.TOP;
 		this._translateTextField.textAlign = egret.HorizontalAlign.CENTER;
-		this._translateTextField.size = 35;
+		this._translateTextField.size = 30;
 		this._translateTextField.text = "";
 		this._translateTextField.fontFamily = "Microsoft YaHei";
 		this.addChild(this._translateTextField);
@@ -214,12 +194,19 @@ class Games extends egret.DisplayObjectContainer {
 
 	//更新单词
 	private updateWord() {
-		let word = this._wordsArray[this._wordIndex]["word"];
+		let word = this._wordsArray[0]["word"];
 		let location = Math.floor(Math.random()*word.length);
 		this._missLetter = word.slice(location,location+1);
 		word = word.replace(this._missLetter,"( )");
 		this._wordTextField.text = word;
-		this._translateTextField.text = this._wordsArray[this._wordIndex]["chinese"];
+		this._translateTextField.text = this._wordsArray[0]["explain"];
+
+		//显示之后删除
+		this._wordsArray.splice(0,1);
+		//检查单词剩余个数
+		if(this._wordsArray.length < 3){
+			this.getWords(2);
+		}
 	}
 
 	private addBarriers(page) {
@@ -500,25 +487,22 @@ class Games extends egret.DisplayObjectContainer {
 			sound.load("resource/sound/speedup.mp3");
 
 			this._wordTextField.text = this._wordTextField.text.replace("( )","("+ text + ")");
-			this._wordIndex++;
+
 			this.updateWord();	
-			if(this._wordIndex < this._wordsArray.length-1) {
-				this._isSpeedUp = true;
-				this._baseSpeed = 1.7;
+			this._isSpeedUp = true;
+			this._baseSpeed = 1.7;
+			//改变分数
+			let speedTimer = new egret.Timer(100, 20);
+			speedTimer.addEventListener(egret.TimerEvent.TIMER, function() {
+				this._score++;
+				this._scoreTextField.text = "" + this._score;
+			}, this);
+			speedTimer.start();
 
-				//改变分数
-				let speedTimer = new egret.Timer(100, 20);
-				speedTimer.addEventListener(egret.TimerEvent.TIMER, function() {
-					this._score++;
-					this._scoreTextField.text = "" + this._score;
-				}, this);
-				speedTimer.start();
-
-				var speed:number = egret.setTimeout(function(param){
-					this._isSpeedUp = false;
-					this._baseSpeed = 1;
-				}, this, 2000, "param");
-			}
+			var speed:number = egret.setTimeout(function(param){
+				this._isSpeedUp = false;
+				this._baseSpeed = 1;
+			}, this, 2000, "param");
 		}
 	}
 
@@ -607,7 +591,7 @@ class Games extends egret.DisplayObjectContainer {
 			let result = JSON.parse(request.response);
             if (result["code"] == 0) {
 				//减次数成功
-				this.setupViews();
+				this.getWords(1);
 				
 			} else if(result["code"] == 2) {
 
@@ -627,14 +611,12 @@ class Games extends egret.DisplayObjectContainer {
 	}
 
 	//接口-请求单词
-	private getWords(type: number) {
-		let params = "?vuid=" + this._info._vuid + 
-					 "&key=" + this._info._key +
-					 "&timenum=" + this._info._timenum +
-					 "&activitynum=" + this._info._activitynum + 
-					 "&rands=" + this._rands + 
-					 "&isfrom=" + this._info._isfrom;
-					 
+	private getWords(type:number) {
+		// let params = "?vuid=" + this._info._vuid + 
+		// 			 "&key=" + this._info._key +
+		// 			 "&rands=" + this._rands + 
+		// 			 "&isfrom=" + this._info._isfrom;
+		let params = "?vuid=6&key=296aab45fdcfc1695ef7f1202893f461&rands=9&isfrom=1";
 		let request = new egret.HttpRequest();
         request.responseType = egret.HttpResponseType.TEXT;
         request.open(this._info._getWord + params, egret.HttpMethod.GET);
@@ -642,14 +624,23 @@ class Games extends egret.DisplayObjectContainer {
         request.send();
 		request.addEventListener(egret.Event.COMPLETE, function() {
 			let result = JSON.parse(request.response);
-
+			
 	        if (result["code"] == 0) {
+				
+				for(let i = 0; i < result["data"].length; i++) {
+					let dict = result["data"][i];
+					this._wordsArray.push(dict);
+				}
+				console.log(this._wordsArray);
+				if(type == 1){
+					this.setupViews();
+				}
 				
 			} else {
 				alert(result["msg"]);
 			}
 		}, this);
-		request.addEventListener(egret.IOErrorEvent.IO_ERROR, function() {
+			request.addEventListener(egret.IOErrorEvent.IO_ERROR, function() {
         }, this);
 	}
 	
