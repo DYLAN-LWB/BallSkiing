@@ -71,7 +71,7 @@ var Games = (function (_super) {
             this._backgroundChannel = sound.play(0, 0);
             this._backgroundChannel.volume = 0.8;
         }, this);
-        sound.load("bg_mp3");
+        sound.load("resource/sound/bg.mp3");
         //添加轨迹背景1
         this._gameBg1 = new egret.Sprite();
         this._gameBg1.x = 0;
@@ -359,7 +359,7 @@ var Games = (function (_super) {
             if (this._guide && this._guide.parent) {
                 this._guide.parent.removeChild(this._guide);
             }
-        }, this, 400, "param");
+        }, this, 600, "param");
     };
     //减速
     Games.prototype.bufferTimerFunc = function (event) {
@@ -424,9 +424,20 @@ var Games = (function (_super) {
         }
     };
     Games.prototype.hitWordLetter = function (tf) {
-        console.log(tf["name"]);
+        var sound = new egret.Sound();
+        sound.addEventListener(egret.Event.COMPLETE, function () {
+            var channel = sound.play(0, 1);
+            channel.volume = 0.9;
+        }, this);
+        sound.load("resource/sound/eat.mp3");
         var text = tf["name"];
         if (text == this._missLetter) {
+            var sound_1 = new egret.Sound();
+            sound_1.addEventListener(egret.Event.COMPLETE, function () {
+                var channel = sound_1.play(0, 1);
+                channel.volume = 0.9;
+            }, this);
+            sound_1.load("resource/sound/rocket.mp3");
             this._wordTextField.text = this._wordTextField.text.replace("( )", "(" + text + ")");
             this._wordIndex++;
             this.updateWord();
@@ -448,56 +459,50 @@ var Games = (function (_super) {
         this.removeEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
         if (this._gameTimer)
             this._gameTimer.stop();
+        var gameChange = new egret.Sprite();
+        gameChange.x = 0;
+        gameChange.y = 0;
+        gameChange.width = this._stageW;
+        gameChange.height = this._stageH;
+        this.addChild(gameChange);
         //this._gameBg1 改变背景
         egret.setTimeout(function () {
-            this._gameBg1.graphics.clear();
-            this._gameBg1.graphics.beginFill(0xFF0000, 0.6);
-            this._gameBg1.graphics.drawRect(0, 0, this._stageW, this._stageH);
-            this._gameBg1.graphics.endFill();
-            this._gameBg2.graphics.clear();
-            this._gameBg2.graphics.beginFill(0xFF0000, 0.6);
-            this._gameBg2.graphics.drawRect(0, 0, this._stageW, this._stageH);
-            this._gameBg2.graphics.endFill();
+            gameChange.graphics.clear();
+            gameChange.graphics.beginFill(0xFF0000, 0.6);
+            gameChange.graphics.drawRect(0, 0, this._stageW, this._stageH);
+            gameChange.graphics.endFill();
         }, this, 50);
         egret.setTimeout(function () {
-            this._gameBg1.graphics.clear();
-            this._gameBg2.graphics.clear();
+            gameChange.graphics.clear();
         }, this, 100);
         egret.setTimeout(function () {
-            this._gameBg1.graphics.clear();
-            this._gameBg1.graphics.beginFill(0xFF0000, 0.6);
-            this._gameBg1.graphics.drawRect(0, 0, this._stageW, this._stageH);
-            this._gameBg1.graphics.endFill();
-            this._gameBg2.graphics.clear();
-            this._gameBg2.graphics.beginFill(0xFF0000, 0.6);
-            this._gameBg2.graphics.drawRect(0, 0, this._stageW, this._stageH);
-            this._gameBg2.graphics.endFill();
+            gameChange.graphics.clear();
+            gameChange.graphics.beginFill(0xFF0000, 0.6);
+            gameChange.graphics.drawRect(0, 0, this._stageW, this._stageH);
+            gameChange.graphics.endFill();
         }, this, 150);
         egret.setTimeout(function () {
-            this._gameBg1.graphics.clear();
-            this._gameBg2.graphics.clear();
+            gameChange.graphics.clear();
         }, this, 200);
         egret.setTimeout(function () {
-            this._gameBg1.graphics.clear();
-            this._gameBg1.graphics.beginFill(0xFF0000, 0.6);
-            this._gameBg1.graphics.drawRect(0, 0, this._stageW, this._stageH);
-            this._gameBg1.graphics.endFill();
-            this._gameBg2.graphics.clear();
-            this._gameBg2.graphics.beginFill(0xFF0000, 0.6);
-            this._gameBg2.graphics.drawRect(0, 0, this._stageW, this._stageH);
-            this._gameBg2.graphics.endFill();
+            gameChange.graphics.clear();
+            gameChange.graphics.beginFill(0xFF0000, 0.6);
+            gameChange.graphics.drawRect(0, 0, this._stageW, this._stageH);
+            gameChange.graphics.endFill();
         }, this, 250);
         egret.setTimeout(function () {
-            this._gameBg1.graphics.clear();
-            this._gameBg2.graphics.clear();
+            gameChange.graphics.clear();
+            gameChange.graphics.beginFill(0x000000, 0.6);
+            gameChange.graphics.drawRect(0, 0, this._stageW, this._stageH);
+            gameChange.graphics.endFill();
+            if (this._backgroundChannel)
+                this._backgroundChannel.stop();
+            // // this.gameOver();
+            // //test
+            this._normalAlert = new Alert(Alert.GamePageScore, "" + this._score, "" + this._score, "1", 0, this._stageW, this._stageH);
+            this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
+            this.addChild(this._normalAlert);
         }, this, 300);
-        if (this._backgroundChannel)
-            this._backgroundChannel.stop();
-        // // this.gameOver();
-        // //test
-        this._normalAlert = new Alert(Alert.GamePageScore, "" + this._score, "" + this._score, "1", 0, this._stageW, this._stageH);
-        this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
-        this.addChild(this._normalAlert);
     };
     Games.prototype.restartGame = function () {
         this.removeChildren();

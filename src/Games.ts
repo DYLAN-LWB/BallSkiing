@@ -71,6 +71,8 @@ class Games extends egret.DisplayObjectContainer {
 			{ "word":"Wednesday", "chinese":"周三" },
 			{ "word":"Thursday", "chinese":"周四" }
 			];
+
+		//test	
 		this.setupViews();
 	}
 
@@ -86,7 +88,7 @@ class Games extends egret.DisplayObjectContainer {
 			this._backgroundChannel = sound.play(0,0);
 			this._backgroundChannel.volume = 0.8;
 		}, this);
-		sound.load("bg_mp3");
+		sound.load("resource/sound/bg.mp3");
 
 		//添加轨迹背景1
 		this._gameBg1 = new egret.Sprite();
@@ -414,7 +416,7 @@ class Games extends egret.DisplayObjectContainer {
 			if(this._guide && this._guide.parent) {
 				this._guide.parent.removeChild(this._guide);
 			}
-		}, this, 400, "param");
+		}, this, 600, "param");
 	}
 	//减速
  	private bufferTimerFunc(event:egret.TimerEvent) {445301354
@@ -483,10 +485,23 @@ class Games extends egret.DisplayObjectContainer {
 	}
 
 	private hitWordLetter(tf) {
-		console.log(tf["name"]);
+
+		let sound = new egret.Sound();
+		sound.addEventListener(egret.Event.COMPLETE, function() {
+			let channel:egret.SoundChannel = sound.play(0,1);
+			channel.volume = 0.9;
+		}, this);
+		sound.load("resource/sound/eat.mp3");
 
 		let text = tf["name"];
 		if(text == this._missLetter) {
+			let sound = new egret.Sound();
+				sound.addEventListener(egret.Event.COMPLETE, function() {
+					let channel:egret.SoundChannel = sound.play(0,1);
+					channel.volume = 0.9;
+				}, this);
+			sound.load("resource/sound/rocket.mp3");
+
 			this._wordTextField.text = this._wordTextField.text.replace("( )","("+ text + ")");
 			this._wordIndex++;
 			this.updateWord();	
@@ -503,70 +518,61 @@ class Games extends egret.DisplayObjectContainer {
 
 	//游戏结束
 	private gameOverFunc () {
-		// alert("game over");
 		//取消监听事件
 		this.stage.removeEventListener(egret.TouchEvent.TOUCH_BEGIN, this.touchBegin, this);
 		this.removeEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
 		if (this._gameTimer) this._gameTimer.stop();
+		if (this._backgroundChannel) this._backgroundChannel.stop();
 
-		//this._gameBg1 改变背景
+		//改变背景
+		let gameChange = new egret.Sprite();
+		gameChange.x = 0;
+		gameChange.y = 0;
+		gameChange.width = this._stageW;
+		gameChange.height = this._stageH;
+        this.addChild(gameChange);
+
 		egret.setTimeout(function(){
-			this._gameBg1.graphics.clear();
-			this._gameBg1.graphics.beginFill(0xFF0000,0.6);
-			this._gameBg1.graphics.drawRect(0,0,this._stageW,this._stageH);
-			this._gameBg1.graphics.endFill();
-			this._gameBg2.graphics.clear();
-			this._gameBg2.graphics.beginFill(0xFF0000,0.6);
-			this._gameBg2.graphics.drawRect(0,0,this._stageW,this._stageH);
-			this._gameBg2.graphics.endFill();
+			gameChange.graphics.beginFill(0xFF0000,0.6);
+			gameChange.graphics.drawRect(0,0,this._stageW,this._stageH);
+			gameChange.graphics.endFill();
 		},this,50);
 
 		egret.setTimeout(function(){
-			this._gameBg1.graphics.clear();
-			this._gameBg2.graphics.clear();
+			gameChange.graphics.clear();
 		},this,100);
 
-
 		egret.setTimeout(function(){
-			this._gameBg1.graphics.clear();
-			this._gameBg1.graphics.beginFill(0xFF0000,0.6);
-			this._gameBg1.graphics.drawRect(0,0,this._stageW,this._stageH);
-			this._gameBg1.graphics.endFill();
-			this._gameBg2.graphics.clear();
-			this._gameBg2.graphics.beginFill(0xFF0000,0.6);
-			this._gameBg2.graphics.drawRect(0,0,this._stageW,this._stageH);
-			this._gameBg2.graphics.endFill();
+			gameChange.graphics.clear();
+			gameChange.graphics.beginFill(0xFF0000,0.6);
+			gameChange.graphics.drawRect(0,0,this._stageW,this._stageH);
+			gameChange.graphics.endFill();
 		},this,150);
 
-
 		egret.setTimeout(function(){
-			this._gameBg1.graphics.clear();
-			this._gameBg2.graphics.clear();
+			gameChange.graphics.clear();
 		},this,200);
 
 		egret.setTimeout(function(){
-			this._gameBg1.graphics.clear();
-			this._gameBg1.graphics.beginFill(0xFF0000,0.6);
-			this._gameBg1.graphics.drawRect(0,0,this._stageW,this._stageH);
-			this._gameBg1.graphics.endFill();
-			this._gameBg2.graphics.clear();
-			this._gameBg2.graphics.beginFill(0xFF0000,0.6);
-			this._gameBg2.graphics.drawRect(0,0,this._stageW,this._stageH);
-			this._gameBg2.graphics.endFill();
+			gameChange.graphics.clear();
+			gameChange.graphics.beginFill(0xFF0000,0.6);
+			gameChange.graphics.drawRect(0,0,this._stageW,this._stageH);
+			gameChange.graphics.endFill();
 		},this,250);
 
 		egret.setTimeout(function(){
-			this._gameBg1.graphics.clear();
-			this._gameBg2.graphics.clear();
+			gameChange.graphics.clear();
+			gameChange.graphics.beginFill(0x000000,0.6);
+			gameChange.graphics.drawRect(0,0,this._stageW,this._stageH);
+			gameChange.graphics.endFill();
+
+			// this.gameOver();
+			//test
+			this._normalAlert = new Alert(Alert.GamePageScore, ""+this._score, ""+this._score, "1", 0,this._stageW,this._stageH);
+			this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
+			this.addChild(this._normalAlert);
+
 		},this,300);
-
-
-		if (this._backgroundChannel) this._backgroundChannel.stop();
-		// // this.gameOver();
-		// //test
-		this._normalAlert = new Alert(Alert.GamePageScore, ""+this._score, ""+this._score, "1", 0,this._stageW,this._stageH);
-		this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
-		this.addChild(this._normalAlert);
 	}
 
 	private restartGame() {
@@ -635,27 +641,6 @@ class Games extends egret.DisplayObjectContainer {
         }, this);
 	}
 	
-	//接口-增加分数
-	private plusScore(score: number) {
-		let params = "?vuid=" + this._info._vuid + 
-					 "&rands=" + this._rands + 
-					 "&tid=" + this._tid + 
-					 "&md5=" + score + 
-					 "&timenum=" + this._info._timenum + 
-					 "&activitynum=" + this._info._activitynum + 
-					 "&isfrom=" + this._info._isfrom;
-		let request = new egret.HttpRequest();
-        request.responseType = egret.HttpResponseType.TEXT;
-        request.open(this._info._typosTempjump+params, egret.HttpMethod.GET);
-        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        request.send();
-		request.addEventListener(egret.Event.COMPLETE, function() {
-			let result = JSON.parse(request.response);
-		}, this);
-		request.addEventListener(egret.IOErrorEvent.IO_ERROR, function() {
-        }, this);
-	}
-
 	//接口-游戏结束
     private gameOver() {
         var params = "?score=" + this._score + 
