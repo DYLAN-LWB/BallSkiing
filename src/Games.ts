@@ -40,6 +40,7 @@ class Games extends egret.DisplayObjectContainer {
 	private _barrierArray2 = [];	//障碍物数组
 	private _letterBgArray1 = [];	//字符数组
 	private _letterBgArray2 = [];	//字符数组
+	private _randomTreeNum = 5;
 
 	private _wordsArray = [];	//单词数组
 	private _wordIndex = 0;	//当前是第几个单词
@@ -86,7 +87,6 @@ class Games extends egret.DisplayObjectContainer {
 		let sound = new egret.Sound();
 		sound.addEventListener(egret.Event.COMPLETE, function() {
 			this._backgroundChannel = sound.play(0,0);
-			this._backgroundChannel.volume = 0.8;
 		}, this);
 		sound.load("resource/sound/bg.mp3");
 
@@ -136,7 +136,7 @@ class Games extends egret.DisplayObjectContainer {
 		//单词
 		this._wordTextField  = new egret.TextField;
 		this._wordTextField.x = 0;
-		this._wordTextField.y = 50;
+		this._wordTextField.y = 30;
 		this._wordTextField.width = this._stageW/2;
 		this._wordTextField.height = 50;
 		this._wordTextField.textColor = 0xffa340;
@@ -150,7 +150,7 @@ class Games extends egret.DisplayObjectContainer {
 		//翻译
 		this._translateTextField  = new egret.TextField;
 		this._translateTextField.x = 0;
-		this._translateTextField.y = 100;
+		this._translateTextField.y = 80;
 		this._translateTextField.width = this._stageW/2;
 		this._translateTextField.height = 50;
 		this._translateTextField.textColor = 0xffa340;
@@ -164,7 +164,7 @@ class Games extends egret.DisplayObjectContainer {
 		//分数
 		let _scoreText  = new egret.TextField;
 		_scoreText.x = this._stageW/2;
-		_scoreText.y = 50;
+		_scoreText.y = 30;
 		_scoreText.width = this._stageW/2;
 		_scoreText.height = 50;
 		_scoreText.textColor = 0x7ed7de;
@@ -177,7 +177,7 @@ class Games extends egret.DisplayObjectContainer {
 
 		this._scoreTextField  = new egret.TextField;
 		this._scoreTextField.x = this._stageW/2;
-		this._scoreTextField.y = 100;
+		this._scoreTextField.y = 80;
 		this._scoreTextField.width = this._stageW/2;
 		this._scoreTextField.height = 50;
 		this._scoreTextField.textColor = 0x7ed7de;
@@ -191,17 +191,9 @@ class Games extends egret.DisplayObjectContainer {
 		this._gameTimer = new egret.Timer(1000, 99999);
 		this._gameTimer.addEventListener(egret.TimerEvent.TIMER, function() {
 			//改变分数
-			this._score ++;
-			this._scoreTextField.text = "" + this._score;
-			if(this._isSpeedUp) {
-				let speedTimer = new egret.Timer(500, 1);
-				speedTimer.addEventListener(egret.TimerEvent.TIMER, function() {
-				//改变分数
+			if(!this._isSpeedUp) {
 				this._score ++;
 				this._scoreTextField.text = "" + this._score;
-		
-				}, this);
-        		speedTimer.start();
 			}
 
 		}, this);
@@ -239,8 +231,15 @@ class Games extends egret.DisplayObjectContainer {
 			this._letterBgArray2.splice(0, this._letterBgArray2.length);
 		}
 
-		for(var i = 0; i < ((this._isFitstApperar ? 2 : 5)+Math.random()*3); i++) {
+		if(this._score > 50) this._randomTreeNum = 10;
+		if(this._score > 100) this._randomTreeNum = 15;
+		if(this._score > 150) this._randomTreeNum = 20;
+		if(this._score > 200) this._randomTreeNum = 25;
+		if(this._score > 250) this._randomTreeNum = 30;
+		if(this._score > 300) this._randomTreeNum = 40;
+		if(this._score > 350) this._randomTreeNum = 50;
 
+		for(var i = 0; i < ((this._isFitstApperar ? 2 : 5)+Math.random()*this._randomTreeNum); i++) {
 			//背景
 			let treeBg = new egret.Sprite;
 			treeBg.x = Math.random()*(this._stageW-80);
@@ -489,25 +488,32 @@ class Games extends egret.DisplayObjectContainer {
 		let sound = new egret.Sound();
 		sound.addEventListener(egret.Event.COMPLETE, function() {
 			let channel:egret.SoundChannel = sound.play(0,1);
-			channel.volume = 0.9;
 		}, this);
 		sound.load("resource/sound/eat.mp3");
 
 		let text = tf["name"];
 		if(text == this._missLetter) {
 			let sound = new egret.Sound();
-				sound.addEventListener(egret.Event.COMPLETE, function() {
-					let channel:egret.SoundChannel = sound.play(0,1);
-					channel.volume = 0.9;
-				}, this);
-			sound.load("resource/sound/rocket.mp3");
+			sound.addEventListener(egret.Event.COMPLETE, function() {
+				let channel:egret.SoundChannel = sound.play(0,1);
+			}, this);
+			sound.load("resource/sound/speedup.mp3");
 
 			this._wordTextField.text = this._wordTextField.text.replace("( )","("+ text + ")");
 			this._wordIndex++;
 			this.updateWord();	
 			if(this._wordIndex < this._wordsArray.length-1) {
 				this._isSpeedUp = true;
-				this._baseSpeed = 1.5;
+				this._baseSpeed = 1.7;
+
+				//改变分数
+				let speedTimer = new egret.Timer(100, 20);
+				speedTimer.addEventListener(egret.TimerEvent.TIMER, function() {
+					this._score++;
+					this._scoreTextField.text = "" + this._score;
+				}, this);
+				speedTimer.start();
+
 				var speed:number = egret.setTimeout(function(param){
 					this._isSpeedUp = false;
 					this._baseSpeed = 1;
@@ -523,6 +529,12 @@ class Games extends egret.DisplayObjectContainer {
 		this.removeEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
 		if (this._gameTimer) this._gameTimer.stop();
 		if (this._backgroundChannel) this._backgroundChannel.stop();
+
+		let sound = new egret.Sound();
+		sound.addEventListener(egret.Event.COMPLETE, function() {
+			let channel:egret.SoundChannel = sound.play(0,1);
+		}, this);
+		sound.load("resource/sound/boom.mp3");
 
 		//改变背景
 		let gameChange = new egret.Sprite();

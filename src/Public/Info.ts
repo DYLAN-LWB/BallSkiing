@@ -7,7 +7,7 @@ class Info  {
     public _downnum           = this._url + "typos/numdown5";            //减游戏次数
     public _gameover          = this._url + "typos/GameOver";            //游戏结束
     public _typosTempjump     = this._url + "typos/typostempjump";       //加分
-    public _getWord           = "//www.beisu100.com/beisuapp/" + "typos/GetBallwords";        //获取单词
+    public _getWord           = "http://www.beisu100.com/beisuapp/typos/getjumpwords";        //获取单词
     public _rankUrl           = this._url + "gamerank/rank/timenum/";    //查看排名
 
     public _vuid:string;    //用户id
