@@ -17,7 +17,7 @@ class Games extends egret.DisplayObjectContainer {
 	private _score = 0;	//分数
 	private _gameTimer: egret.Timer;	//游戏计时器
 
-	private _ball = new Bitmap("ball_png");	//小球
+	private _ball = new egret.Sprite();	//小球
 	private _moveToRight:boolean = true;	//小球是否在向右移动
 	private _ballY = 400;
 	private _ballMoveSpeed = 10;	//小球移动速度
@@ -95,6 +95,9 @@ class Games extends egret.DisplayObjectContainer {
 		this._ball.anchorOffsetY = this._ball.height/2;
 		this._ball.x = this._stageW/2;
 		this._ball.y = this._ballY;
+		this._ball.graphics.beginFill(0x7ed7de,1);
+		this._ball.graphics.drawCircle(15,15,15);
+		this._ball.graphics.endFill();
 		this.addChild(this._ball);
 
 		//单词
@@ -212,14 +215,6 @@ class Games extends egret.DisplayObjectContainer {
 		//设置初始位置
 		this._lastLocusPointX = this._stageW/2;
 		this._lastLocusPointY = this._ballY;
-
-		//
-		// let _gameBg = new egret.Sprite();
-		// this._gameBg1.x = 0;
-		// this._gameBg1.y = 0;
-		// this._gameBg1.width = this._stageW;
-		// this._gameBg1.height = this._stageH;
-        // this.addChild(this._gameBg1);
 	}
 
 	//更新单词
@@ -293,8 +288,8 @@ class Games extends egret.DisplayObjectContainer {
 
 			let letter = randomLetter[l].toLowerCase();
 			let letImg = new Bitmap("Eword_json."+letter);
-			letImg.width = 50;
-			letImg.height = 50;
+			letImg.width = 60;
+			letImg.height = 60;
 			letImg.anchorOffsetX = letImg.width/2;
 			letImg.anchorOffsetY = letImg.height/2;
 			letImg.x = 80 + Math.random()*(this._stageW-160);
@@ -336,7 +331,6 @@ class Games extends egret.DisplayObjectContainer {
 			this._gameBg11.removeChildren();
 			this._gameBg1.y = this._gameBg2.y + this._stageH;
 			this._gameBg11.y = this._gameBg1.y;
-			this._locusPointAaray.splice(0, this._locusPointAaray.length);
 			this.addBarriers(1);
 		}
 
@@ -345,12 +339,17 @@ class Games extends egret.DisplayObjectContainer {
 			this._gameBg22.removeChildren();
 			this._gameBg2.y = this._gameBg1.y  + this._stageH;
 			this._gameBg22.y = this._gameBg2.y;
-			this._locusPointAaray.splice(0, this._locusPointAaray.length);
 			this.addBarriers(2);
+		}
+
+		//移除超出屏幕的
+		if (this._locusPointAaray.length > 40) {
+			this._locusPointAaray.splice(0, 1);
 		}
 
 		let locusPoint = new egret.Shape();	//轨迹点
 		let currentLocusPointY = 0;	//点相对于背景图的Y值
+
 		//判断添加到哪个背景,背景1的最大Y值在 _ballY ~ H+_ballY之间
 		if ((this._gameBg1.y+this._gameBg1.height) > this._ballY && (this._gameBg1.y+this._gameBg1.height) <= (this._stageH+this._ballY)) {
 			this._gameBg1.addChild(locusPoint);
@@ -361,37 +360,15 @@ class Games extends egret.DisplayObjectContainer {
 		}
 
 		//跨背景图时特殊处理
-		// console.log("line from= " + this._lastLocusPointY + " ----to " + (currentLocusPointY));
 		if(this._lastLocusPointY >= (this._stageH - this._bgMoveSpeed*this._baseSpeed)) {
 			this._lastLocusPointY = currentLocusPointY - this._bgMoveSpeed*this._baseSpeed;
 		}
 
-		//保存对象,起点,终点
-		var dict = {
-			"beginX":this._lastLocusPointX,
-			"beginY":this._lastLocusPointY,
-			"endX":this._ball.x,
-			"endY":currentLocusPointY,
-			"object":locusPoint,
-		};
+		locusPoint.graphics.lineStyle(this._locusW, 0x7ed7de, 1, true);
+		locusPoint.graphics.moveTo(this._lastLocusPointX, this._lastLocusPointY);
+		locusPoint.graphics.lineTo(this._ball.x, currentLocusPointY);
 
-		this._locusPointAaray.reverse();
-		this._locusPointAaray.push(dict);
-		this._locusPointAaray.reverse();
-
-		for (var i = 0; i < this._locusPointAaray.length; i++) {
-			let maxWidth = this._locusW*0.055*i;
-			if(maxWidth > this._locusW*4) {
-				maxWidth = this._locusW*4;	
-			}
-			if(maxWidth < this._locusW) {
-				maxWidth = this._locusW;
-			}
-			var point = this._locusPointAaray[i]["object"];	// 红 0xEBBCB5
-			point.graphics.lineStyle(maxWidth, this._isSpeedUp ? 0x7ed7de : 0x7ed7de, 1, true);
-			point.graphics.moveTo(this._locusPointAaray[i]["beginX"], this._locusPointAaray[i]["beginY"]);
-			point.graphics.lineTo(this._locusPointAaray[i]["endX"] , this._locusPointAaray[i]["endY"]);
-		}
+		this._locusPointAaray.push(locusPoint);
 
 		//重新保存上次位置
 		this._lastLocusPointX = this._ball.x;
@@ -409,7 +386,6 @@ class Games extends egret.DisplayObjectContainer {
         bufferTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, this.bufferTimerComFunc, this);
         bufferTimer.start();
 
-		console.log(this._guide);
 		if(this._guide && this._guide.parent) {
 			this._guide.parent.removeChild(this._guide);
 		}
@@ -422,18 +398,16 @@ class Games extends egret.DisplayObjectContainer {
 		this._guide.x = this._ball.x - this._ball.width;
 		this._guide.y = this._ball.y - this._ball.height;
 		
-
 		if(this._moveToRight) {
-			this._guide.rotation = 45;
-			this._guide.x = this._ball.x - this._ball.width + 50;
+			this._guide.rotation = 30;
+			this._guide.x = this._ball.x - this._ball.width + 30;
 			this._guide.y = this._ball.y - this._ball.height - 25;
 		} else {
-			this._guide.rotation = -45;
+			this._guide.rotation = -30;
 			this._guide.x = this._ball.x - this._ball.width - 30;
-			this._guide.y = this._ball.y - this._ball.height + 20;
+			this._guide.y = this._ball.y - this._ball.height + 10;
 		}
 		this.addChild(this._guide);
-
 
 		var speed:number = egret.setTimeout(function(param){
 			if(this._guide && this._guide.parent) {
