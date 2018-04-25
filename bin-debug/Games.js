@@ -80,16 +80,6 @@ var Games = (function (_super) {
         this._ball.x = this._stageW / 2;
         this._ball.y = this._ballY;
         this.addChild(this._ball);
-        this._guide = new Movie();
-        this._guide.init("speed_json", "speed_png", "speed", -1);
-        this._guide.alpha = 1;
-        this._guide.width = 60;
-        this._guide.height = 60;
-        this._guide.anchorOffsetX = this._guide.width / 2;
-        this._guide.anchorOffsetY = this._guide.height;
-        this._guide.x = this._ball.x;
-        this._guide.y = this._ball.y;
-        this.addChild(this._guide);
         //单词
         this._wordTextField = new egret.TextField;
         this._wordTextField.x = 0;
@@ -192,6 +182,13 @@ var Games = (function (_super) {
         //设置初始位置
         this._lastLocusPointX = this._stageW / 2;
         this._lastLocusPointY = this._ballY;
+        //
+        // let _gameBg = new egret.Sprite();
+        // this._gameBg1.x = 0;
+        // this._gameBg1.y = 0;
+        // this._gameBg1.width = this._stageW;
+        // this._gameBg1.height = this._stageH;
+        // this.addChild(this._gameBg1);
     };
     //更新单词
     Games.prototype.updateWord = function () {
@@ -278,12 +275,12 @@ var Games = (function (_super) {
     Games.prototype.frameObserve = function () {
         //根据移动方向设置球的位置,触碰到边缘游戏结束
         this._ball.x += (this._moveToRight == true ? this._ballMoveSpeed : -this._ballMoveSpeed);
-        if ((this._ball.x >= (this._stageW - this._ball.width)) || this._ball.x <= 0) {
+        if ((this._ball.x >= (this._stageW - this._ball.width)) || this._ball.x <= this._ball.width) {
             this.gameOverFunc();
         }
-        //动画位置
-        this._guide.x = this._ball.x;
-        this._guide.y = this._ball.y;
+        if (this._guide) {
+            this._guide.x += (this._moveToRight == true ? this._ballMoveSpeed : -this._ballMoveSpeed);
+        }
         //移动游戏背景
         this._gameBg1.y -= this._bgMoveSpeed * this._baseSpeed;
         this._gameBg2.y -= this._bgMoveSpeed * this._baseSpeed;
@@ -358,15 +355,38 @@ var Games = (function (_super) {
         bufferTimer.addEventListener(egret.TimerEvent.TIMER, this.bufferTimerFunc, this);
         bufferTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, this.bufferTimerComFunc, this);
         bufferTimer.start();
-        this._guide.alpha = 1;
-        this._guide.rotation = this._moveToRight ? 90 : -90;
+        console.log(this._guide);
+        if (this._guide && this._guide.parent) {
+            this._guide.parent.removeChild(this._guide);
+        }
+        this._guide = new Movie();
+        this._guide.init("speed_json", "speed_png", "speed", -1);
+        this._guide.width = 50;
+        this._guide.height = 150;
+        this._guide.anchorOffsetX = this._guide.width / 2;
+        this._guide.anchorOffsetY = this._guide.height;
+        this._guide.x = this._ball.x - this._ball.width;
+        this._guide.y = this._ball.y - this._ball.height;
+        if (this._moveToRight) {
+            this._guide.rotation = 45;
+            this._guide.x = this._ball.x - this._ball.width + 50;
+            this._guide.y = this._ball.y - this._ball.height - 25;
+        }
+        else {
+            this._guide.rotation = -45;
+            this._guide.x = this._ball.x - this._ball.width - 30;
+            this._guide.y = this._ball.y - this._ball.height + 20;
+        }
+        this.addChild(this._guide);
         var speed = egret.setTimeout(function (param) {
-            this._guide.alpha = 1;
-            this._guide.rotation = 0;
-        }, this, 2000, "param");
+            if (this._guide && this._guide.parent) {
+                this._guide.parent.removeChild(this._guide);
+            }
+        }, this, 500, "param");
     };
     //减速
     Games.prototype.bufferTimerFunc = function (event) {
+        445301354;
         this._ballMoveSpeed -= 0.5;
         if (this._ballMoveSpeed < 0) {
             this._ballMoveSpeed = 0;
@@ -454,7 +474,7 @@ var Games = (function (_super) {
             this._backgroundChannel.stop();
         // // this.gameOver();
         // //test
-        this._normalAlert = new Alert(Alert.GamePageScore, "" + this._score, "1000", "1", 0, this._stageW, this._stageH);
+        this._normalAlert = new Alert(Alert.GamePageScore, "" + this._score, "" + this._score, "1", 0, this._stageW, this._stageH);
         this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
         this.addChild(this._normalAlert);
     };
