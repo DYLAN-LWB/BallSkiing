@@ -5,9 +5,11 @@ var Info = (function () {
     function Info() {
         // public  _url = "//www.beisu100.com/beisuapp/";	// 线上环境
         this._url = "//ceshi.beisu100.com/beisuapp/"; //测试环境
+        // public _url = interface_url + "/beisuapp/";
         this._downnum = this._url + "typos/numdown5"; //减游戏次数
         this._gameover = this._url + "typos/GameOver"; //游戏结束
         this._getWord = "http://www.beisu100.com/beisuapp/typos/getjumpwords"; //获取单词
+        this._rankUrl = this._url + "gamerank/rank/timenum/";
     }
     return Info;
 }());

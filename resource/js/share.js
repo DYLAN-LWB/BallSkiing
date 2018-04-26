@@ -4,8 +4,8 @@ var WxShareData = {
     link: "", //"" + sharelink,
     imgUrl: ""
 };
-var _baseUrl = "//www.beisu100.com";
-// var _baseUrl = "//ceshi.beisu100.com";
+var _baseUrl = interface_url;
+//var _baseUrl = "//ceshi.beisu100.com";
 
 var sharelink = window.location.href;
 function share(shareconfig) {
@@ -32,7 +32,7 @@ function sharegame() {
         data: {url: sharelink},
         jsonpCallback: "success_jsonpCallback",
         success: function (D) {
-            // console.log(D);
+            console.log(D);
             wx.config({
                 appId: D.data.appId,
                 timestamp: D.data.timestamp,
@@ -100,7 +100,10 @@ function sharegame() {
 //接口请求获取参数
 function geturldata(){
     var data = GetRequest();
-    getShareData(data.timenum,data.activitynum,data.uid);
+         if(localStorage.getItem("timenum1"))
+    {
+        getShareData(localStorage.getItem("timenum1"),localStorage.getItem("activitynum1"),localStorage.getItem("uid1"));
+    }
 };
 geturldata();
 function GetRequest() {
@@ -127,9 +130,9 @@ function getShareData(timenum,activitynum,vuid) {
             "activitynum": activitynum,
             "vuid": vuid
         },
-        jsonpCallback: "success_jsonpCallback",
+        jsonpCallback: "success_jsonpCallback", 
         success: function (D) {
-            // console.log(D);
+            console.log(D);
             share(D.data);
         },
         error: function (data) {

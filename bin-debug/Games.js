@@ -45,14 +45,13 @@ var Games = (function (_super) {
         // this._info._isfrom = localStorage.getItem("isfrom").replace(/"/g,"");
         // this._info._timenum = localStorage.getItem("timenum").replace(/"/g,"");
         // this._info._activitynum = localStorage.getItem("activitynum").replace(/"/g,"");
-        // //test
-        // this._info._vuid = "6";
-        // this._info._key = "296aab45fdcfc1695ef7f1202893f461";
-        // this._info._isfrom = "1";
-        // this._info._timenum = "1";
-        // this._info._activitynum = "9";
         // this.minusGameCount();
-        //test	
+        //test
+        this._info._vuid = "6";
+        this._info._key = "296aab45fdcfc1695ef7f1202893f461";
+        this._info._isfrom = "1";
+        this._info._timenum = "1";
+        this._info._activitynum = "9";
         this.getWords(1);
     };
     Games.prototype.setupViews = function () {
@@ -61,12 +60,9 @@ var Games = (function (_super) {
         //添加帧事件
         this.addEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
         //背景音乐
-        var sound = new egret.Sound();
-        sound.addEventListener(egret.Event.COMPLETE, function () {
-            this._backgroundChannel = sound.play(0, 0);
-            this._backgroundChannel.volume = 0.2;
-        }, this);
-        sound.load("resource/sound/bg.mp3");
+        var bgSound = RES.getRes("bg_mp3");
+        this._bgMusic = bgSound.play();
+        this._bgMusic.volume = 0.7;
         //添加轨迹背景1
         this._gameBg1 = new egret.Sprite();
         this._gameBg1.x = 0;
@@ -236,7 +232,7 @@ var Games = (function (_super) {
             hitObject.x = 20;
             hitObject.y = treeBg.height - 15;
             hitObject.graphics.beginFill(0xff0000, 0.001);
-            hitObject.graphics.drawRect(0, 0, 20, 30);
+            hitObject.graphics.drawRect(0, 0, 20, 40);
             hitObject.graphics.endFill();
             hitObject.name = "hit";
             treeBg.addChild(hitObject);
@@ -432,20 +428,14 @@ var Games = (function (_super) {
         }
     };
     Games.prototype.hitWordLetter = function (tf) {
-        var sound = new egret.Sound();
-        sound.addEventListener(egret.Event.COMPLETE, function () {
-            var channel = sound.play(0, 1);
-            channel.volume = 0.3;
-        }, this);
-        sound.load("resource/sound/eat.mp3");
+        var sound = RES.getRes("eat_mp3");
+        var music = sound.play(0, 1);
+        music.volume = 0.7;
         var text = tf["name"];
         if (text == this._missLetter) {
-            var sound_1 = new egret.Sound();
-            sound_1.addEventListener(egret.Event.COMPLETE, function () {
-                var channel = sound_1.play(0, 1);
-                channel.volume = 0.3;
-            }, this);
-            sound_1.load("resource/sound/speedup.mp3");
+            var sound_1 = RES.getRes("speedup_mp3");
+            var music = sound_1.play(0, 1);
+            music.volume = 0.7;
             this._wordTextField.text = this._wordTextField.text.replace("( )", "(" + text + ")");
             var playWord = this._wordTextField.text.replace("(", "");
             playWord = playWord.replace(")", "");
@@ -500,14 +490,11 @@ var Games = (function (_super) {
         this.removeEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
         if (this._gameTimer)
             this._gameTimer.stop();
-        if (this._backgroundChannel)
-            this._backgroundChannel.stop();
-        var sound = new egret.Sound();
-        sound.addEventListener(egret.Event.COMPLETE, function () {
-            var channel = sound.play(0, 1);
-            channel.volume = 0.3;
-        }, this);
-        sound.load("resource/sound/boom.mp3");
+        if (this._bgMusic)
+            this._bgMusic.stop();
+        var sound = RES.getRes("boom_mp3");
+        var music = sound.play(0, 1);
+        music.volume = 0.7;
         //改变背景
         var gameChange = new egret.Sprite();
         gameChange.x = 0;
@@ -572,10 +559,19 @@ var Games = (function (_super) {
                 this.getWords(1);
             }
             else if (result["code"] == 2) {
+                var gameChange = new egret.Sprite();
+                gameChange.x = 0;
+                gameChange.y = 0;
+                gameChange.width = this._stageW;
+                gameChange.height = this._stageH;
+                gameChange.graphics.beginFill(0x000000, 0.6);
+                gameChange.graphics.drawRect(0, 0, this._stageW, this._stageH);
+                gameChange.graphics.endFill();
+                this.addChild(gameChange);
                 var _overAlert = new Alert(Alert.GamePageShare, "", "", "", 0, this._stageW, this._stageH);
                 _overAlert.addEventListener(AlertEvent.Share, this.shareButtonClick, this);
                 _overAlert.addEventListener(AlertEvent.Cancle, function () {
-                    window.location.reload();
+                    window.location.href = "../index.html";
                 }, this);
                 this.addChild(_overAlert);
             }
@@ -589,11 +585,10 @@ var Games = (function (_super) {
     };
     //接口-请求单词
     Games.prototype.getWords = function (type) {
-        // let params = "?vuid=" + this._info._vuid + 
-        // 			 "&key=" + this._info._key +
-        // 			 "&rands=" + this._rands + 
-        // 			 "&isfrom=" + this._info._isfrom;
-        var params = "?vuid=6&key=296aab45fdcfc1695ef7f1202893f461&rands=9&isfrom=1";
+        var params = "?vuid=" + this._info._vuid +
+            "&key=" + this._info._key +
+            "&rands=9" + "&isfrom=1";
+        // let params = "?vuid=6&key=296aab45fdcfc1695ef7f1202893f461&rands=9&isfrom=1";
         var request = new egret.HttpRequest();
         request.responseType = egret.HttpResponseType.TEXT;
         request.open(this._info._getWord + params, egret.HttpMethod.GET);
@@ -601,6 +596,7 @@ var Games = (function (_super) {
         request.send();
         request.addEventListener(egret.Event.COMPLETE, function () {
             var result = JSON.parse(request.response);
+            console.log(result);
             if (result["code"] == 0) {
                 for (var i = 0; i < result["data"].length; i++) {
                     var dict = result["data"][i];

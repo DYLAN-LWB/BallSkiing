@@ -12,7 +12,7 @@ class Games extends egret.DisplayObjectContainer {
 	private _normalAlert;
 	private _stageW;	//舞台宽度
 	private _stageH;	//舞台高度
-	private _backgroundChannel: egret.SoundChannel;	//游戏背景音乐
+	private _bgMusic;	//游戏背景音乐
 	private _scoreTextField; //显示的分数
 	private _score = 0;	//分数
 	private _gameTimer: egret.Timer;	//游戏计时器
@@ -53,22 +53,21 @@ class Games extends egret.DisplayObjectContainer {
 		this._stageW = this.stage.stageWidth;
 		this._stageH = this.stage.stageHeight;
 
-		// this._info._vuid = localStorage.getItem("vuid").replace(/"/g,"");
-		// this._info._key = localStorage.getItem("key").replace(/"/g,"");
-		// this._info._isfrom = localStorage.getItem("isfrom").replace(/"/g,"");
-		// this._info._timenum = localStorage.getItem("timenum").replace(/"/g,"");
-		// this._info._activitynum = localStorage.getItem("activitynum").replace(/"/g,"");
+		this._info._vuid = localStorage.getItem("vuid").replace(/"/g,"");
+		this._info._key = localStorage.getItem("key").replace(/"/g,"");
+		this._info._isfrom = localStorage.getItem("isfrom").replace(/"/g,"");
+		this._info._timenum = localStorage.getItem("timenum").replace(/"/g,"");
+		this._info._activitynum = localStorage.getItem("activitynum").replace(/"/g,"");
 
-		// //test
+		this.minusGameCount();
+
+		//test
 		// this._info._vuid = "6";
 		// this._info._key = "296aab45fdcfc1695ef7f1202893f461";
 		// this._info._isfrom = "1";
 		// this._info._timenum = "1";
 		// this._info._activitynum = "9";
-
-		// this.minusGameCount();
-		//test	
-		this.getWords(1);
+		// this.getWords(1);
 	}
 
 	private setupViews() {
@@ -78,12 +77,9 @@ class Games extends egret.DisplayObjectContainer {
 		this.addEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
 
 		//背景音乐
-		let sound = new egret.Sound();
-		sound.addEventListener(egret.Event.COMPLETE, function() {
-			this._backgroundChannel = sound.play(0,0);
-			this._backgroundChannel.volume = 0.2;
-		}, this);
-		sound.load("resource/sound/bg.mp3");
+		let bgSound = RES.getRes("bg_mp3");
+		this._bgMusic = bgSound.play();
+		this._bgMusic.volume = 0.7;
 
 		//添加轨迹背景1
 		this._gameBg1 = new egret.Sprite();
@@ -260,13 +256,13 @@ class Games extends egret.DisplayObjectContainer {
 			//碰撞块
 			let hitObject = new egret.Sprite;
 			hitObject.width = 20;
-			hitObject.height = 30;
+			hitObject.height = 40;
 			hitObject.anchorOffsetX = hitObject.width/2;
 			hitObject.anchorOffsetY = hitObject.height/2;
 			hitObject.x = 20;
 			hitObject.y = treeBg.height - 15;
 			hitObject.graphics.beginFill(0xff0000,0.001);
-			hitObject.graphics.drawRect(0,0,20,30);
+			hitObject.graphics.drawRect(0,0,20,40);
 			hitObject.graphics.endFill();
 			hitObject.name = "hit";
 			treeBg.addChild(hitObject);
@@ -487,21 +483,15 @@ class Games extends egret.DisplayObjectContainer {
 
 	private hitWordLetter(tf) {
 
-		let sound = new egret.Sound();
-		sound.addEventListener(egret.Event.COMPLETE, function() {
-			let channel:egret.SoundChannel = sound.play(0,1);
-			channel.volume = 0.3;
-		}, this);
-		sound.load("resource/sound/eat.mp3");
+		let sound:egret.Sound = RES.getRes("eat_mp3");
+		var music = sound.play(0,1);
+		music.volume = 0.7;
 
 		let text = tf["name"];
 		if(text == this._missLetter) {
-			let sound = new egret.Sound();
-			sound.addEventListener(egret.Event.COMPLETE, function() {
-				let channel:egret.SoundChannel = sound.play(0,1);
-				channel.volume = 0.3;
-			}, this);
-			sound.load("resource/sound/speedup.mp3");
+			let sound:egret.Sound = RES.getRes("speedup_mp3");
+			var music = sound.play(0,1);
+			music.volume = 0.7;
 
 			this._wordTextField.text = this._wordTextField.text.replace("( )","("+ text + ")");
 
@@ -546,9 +536,7 @@ class Games extends egret.DisplayObjectContainer {
 						document.getElementById('word').setAttribute('src', D.baesInfo.symbols[0].ph_en_mp3);
 						document.getElementById('word').play();
 					}
-				}
-				
-				
+				}				
 			},
 			error:function(data){
 				console.log(data);
@@ -562,14 +550,11 @@ class Games extends egret.DisplayObjectContainer {
 		this.stage.removeEventListener(egret.TouchEvent.TOUCH_BEGIN, this.touchBegin, this);
 		this.removeEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
 		if (this._gameTimer) this._gameTimer.stop();
-		if (this._backgroundChannel) this._backgroundChannel.stop();
+		if (this._bgMusic) this._bgMusic.stop();
 
-		let sound = new egret.Sound();
-		sound.addEventListener(egret.Event.COMPLETE, function() {
-			let channel:egret.SoundChannel = sound.play(0,1);
-			channel.volume = 0.3;
-		}, this);
-		sound.load("resource/sound/boom.mp3");
+		let sound:egret.Sound = RES.getRes("boom_mp3");
+		var music = sound.play(0,1);
+		music.volume = 0.7;
 
 		//改变背景
 		let gameChange = new egret.Sprite();
@@ -613,18 +598,13 @@ class Games extends egret.DisplayObjectContainer {
 			gameChange.graphics.drawRect(0,0,this._stageW,this._stageH);
 			gameChange.graphics.endFill();
 
-			// this.gameOver();
+			this.gameOver();
 			//test
-			this._normalAlert = new Alert(Alert.GamePageScore, ""+this._score, ""+this._score, "1", 0,this._stageW,this._stageH);
-			this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
-			this.addChild(this._normalAlert);
+			// this._normalAlert = new Alert(Alert.GamePageScore, ""+this._score, ""+this._score, "1", 0,this._stageW,this._stageH);
+			// this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
+			// this.addChild(this._normalAlert);
 
 		},this,300);
-	}
-
-	private restartGame() {
-		this.removeChildren();
-		this.addChild(new Games());
 	}
 
 	//接口-减游戏次数
@@ -646,10 +626,20 @@ class Games extends egret.DisplayObjectContainer {
 				
 			} else if(result["code"] == 2) {
 
+				let gameChange = new egret.Sprite();
+				gameChange.x = 0;
+				gameChange.y = 0;
+				gameChange.width = this._stageW;
+				gameChange.height = this._stageH;
+				gameChange.graphics.beginFill(0x000000,0.6);
+				gameChange.graphics.drawRect(0,0,this._stageW,this._stageH);
+				gameChange.graphics.endFill();
+				this.addChild(gameChange);
+
 				let _overAlert = new Alert(Alert.GamePageShare, "", "", "",0,this._stageW,this._stageH);
 				_overAlert.addEventListener(AlertEvent.Share, this.shareButtonClick, this);
 				_overAlert.addEventListener(AlertEvent.Cancle, function() {
-					window.location.reload();
+					window.location.href = "../index.html"
 				}, this);
 				this.addChild(_overAlert);
 			} else {
@@ -663,11 +653,10 @@ class Games extends egret.DisplayObjectContainer {
 
 	//接口-请求单词
 	private getWords(type:number) {
-		// let params = "?vuid=" + this._info._vuid + 
-		// 			 "&key=" + this._info._key +
-		// 			 "&rands=" + this._rands + 
-		// 			 "&isfrom=" + this._info._isfrom;
-		let params = "?vuid=6&key=296aab45fdcfc1695ef7f1202893f461&rands=9&isfrom=1";
+		let params = "?vuid=" + this._info._vuid + 
+					 "&key=" + this._info._key +
+					 "&rands=9" + "&isfrom=1";
+		// let params = "?vuid=6&key=296aab45fdcfc1695ef7f1202893f461&rands=9&isfrom=1";
 		let request = new egret.HttpRequest();
         request.responseType = egret.HttpResponseType.TEXT;
         request.open(this._info._getWord + params, egret.HttpMethod.GET);
@@ -675,7 +664,7 @@ class Games extends egret.DisplayObjectContainer {
         request.send();
 		request.addEventListener(egret.Event.COMPLETE, function() {
 			let result = JSON.parse(request.response);
-			
+			console.log(result);
 	        if (result["code"] == 0) {
 				
 				for(let i = 0; i < result["data"].length; i++) {
@@ -725,6 +714,12 @@ class Games extends egret.DisplayObjectContainer {
         }, this);
     }
 
+	//重玩
+	private restartGame() {
+		this.removeChildren();
+		this.addChild(new Games());
+	}
+
 	//游戏结束alert-查看排名
 	private checkRanking() {
 		if(this._normalAlert && this._normalAlert.parent) {
@@ -733,6 +728,7 @@ class Games extends egret.DisplayObjectContainer {
         window.location.href = this._info._rankUrl + this._info._timenum + "/activitynum/" + this._info._activitynum + "/vuid/" + this._info._vuid + "/key/" + this._info._key + "/isfrom/" + this._info._isfrom;
     }
 
+	//分享
 	private shareButtonClick() {
         //分享引导图
         let _shareGuide = new Bitmap("shareGui_png");
