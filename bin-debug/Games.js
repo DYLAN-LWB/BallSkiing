@@ -40,6 +40,18 @@ var Games = (function (_super) {
     Games.prototype.createGameScene = function () {
         this._stageW = this.stage.stageWidth;
         this._stageH = this.stage.stageHeight;
+        // this._info._vuid = localStorage.getItem("vuid").replace(/"/g,"");
+        // this._info._key = localStorage.getItem("key").replace(/"/g,"");
+        // this._info._isfrom = localStorage.getItem("isfrom").replace(/"/g,"");
+        // this._info._timenum = localStorage.getItem("timenum").replace(/"/g,"");
+        // this._info._activitynum = localStorage.getItem("activitynum").replace(/"/g,"");
+        // //test
+        // this._info._vuid = "6";
+        // this._info._key = "296aab45fdcfc1695ef7f1202893f461";
+        // this._info._isfrom = "1";
+        // this._info._timenum = "1";
+        // this._info._activitynum = "9";
+        // this.minusGameCount();
         //test	
         this.getWords(1);
     };
@@ -52,6 +64,7 @@ var Games = (function (_super) {
         var sound = new egret.Sound();
         sound.addEventListener(egret.Event.COMPLETE, function () {
             this._backgroundChannel = sound.play(0, 0);
+            this._backgroundChannel.volume = 0.2;
         }, this);
         sound.load("resource/sound/bg.mp3");
         //添加轨迹背景1
@@ -173,7 +186,7 @@ var Games = (function (_super) {
         //显示之后删除
         this._wordsArray.splice(0, 1);
         //检查单词剩余个数
-        if (this._wordsArray.length < 9) {
+        if (this._wordsArray.length < 3) {
             this.getWords(2);
         }
     };
@@ -422,6 +435,7 @@ var Games = (function (_super) {
         var sound = new egret.Sound();
         sound.addEventListener(egret.Event.COMPLETE, function () {
             var channel = sound.play(0, 1);
+            channel.volume = 0.3;
         }, this);
         sound.load("resource/sound/eat.mp3");
         var text = tf["name"];
@@ -429,10 +443,13 @@ var Games = (function (_super) {
             var sound_1 = new egret.Sound();
             sound_1.addEventListener(egret.Event.COMPLETE, function () {
                 var channel = sound_1.play(0, 1);
+                channel.volume = 0.3;
             }, this);
             sound_1.load("resource/sound/speedup.mp3");
             this._wordTextField.text = this._wordTextField.text.replace("( )", "(" + text + ")");
-            this.updateWord();
+            var playWord = this._wordTextField.text.replace("(", "");
+            playWord = playWord.replace(")", "");
+            this.playTheWord(playWord);
             this._isSpeedUp = true;
             this._baseSpeed = 1.7;
             //改变分数
@@ -443,10 +460,38 @@ var Games = (function (_super) {
             }, this);
             speedTimer.start();
             var speed = egret.setTimeout(function (param) {
+                this.updateWord();
                 this._isSpeedUp = false;
                 this._baseSpeed = 1;
             }, this, 2000, "param");
         }
+    };
+    Games.prototype.playTheWord = function (word) {
+        $.ajax({
+            type: "get",
+            url: "http://www.iciba.com/index.php?a=getWordMean&c=search&list=1%2C3%2C4%2C8%2C9%2C12%2C13%2C15&word=" + word + "&_=1524202431112&callback=jsonp4",
+            dataType: "jsonp",
+            async: false,
+            json: "callback",
+            jsonpCallback: "success_jsonpCallback",
+            success: function (D) {
+                console.log(D);
+                if (D.baesInfo.symbols) {
+                    document.getElementById("word").volume = 1;
+                    if (D.baesInfo.symbols[0].ph_am_mp3) {
+                        document.getElementById('word').setAttribute('src', D.baesInfo.symbols[0].ph_am_mp3);
+                        document.getElementById('word').play();
+                    }
+                    else if (D.baesInfo.symbols[0].ph_en_mp3) {
+                        document.getElementById('word').setAttribute('src', D.baesInfo.symbols[0].ph_en_mp3);
+                        document.getElementById('word').play();
+                    }
+                }
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
     };
     //游戏结束
     Games.prototype.gameOverFunc = function () {
@@ -460,6 +505,7 @@ var Games = (function (_super) {
         var sound = new egret.Sound();
         sound.addEventListener(egret.Event.COMPLETE, function () {
             var channel = sound.play(0, 1);
+            channel.volume = 0.3;
         }, this);
         sound.load("resource/sound/boom.mp3");
         //改变背景

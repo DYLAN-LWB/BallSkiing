@@ -35,13 +35,13 @@
 
     <!--这个标签会被替换为项目中所有的 javascript 文件。删除 game_files 标签后，项目文件加载列表将不会变化，请谨慎操作！-->
     <!--game_files_start-->
-	<script egret="lib" src="bin-debug/Public/Bitmap.js"></script>
-	<script egret="lib" src="bin-debug/Public/Info.js"></script>
 	<script egret="lib" src="bin-debug/Games.js"></script>
 	<script egret="lib" src="bin-debug/LoadingUI.js"></script>
 	<script egret="lib" src="bin-debug/Main.js"></script>
 	<script egret="lib" src="bin-debug/Public/Alert.js"></script>
 	<script egret="lib" src="bin-debug/Public/AlertEvent.js"></script>
+	<script egret="lib" src="bin-debug/Public/Bitmap.js"></script>
+	<script egret="lib" src="bin-debug/Public/Info.js"></script>
 	<script egret="lib" src="bin-debug/Public/Movie.js"></script>
 	<!--game_files_end-->
 
@@ -55,6 +55,8 @@
     <div id = "attention" onclick="clickAttention();" style="display: none; z-index: 9999; position: absolute;">
         <img style="width: 100%; height: 100%;" src="resource/game/attention.png"/>
     </div>
+
+    <audio style="display: none" id="word" src=""></audio>
 
     <div style="margin: auto;width: 100%;height: 100%;" class="egret-player"
          data-entry-class="Main"
