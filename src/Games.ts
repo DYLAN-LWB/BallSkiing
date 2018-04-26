@@ -7,7 +7,6 @@ class Games extends egret.DisplayObjectContainer {
 	//public
     private _info = new Info(); //公用信息表
 	private _linnum: number;	//剩余挑战次数
-	private _rands: string;		//随机字符串,提交分数时加	
 	private _tid: string;
 	private _normalAlert;
 	private _stageW;	//舞台宽度
@@ -183,8 +182,9 @@ class Games extends egret.DisplayObjectContainer {
 		this._gameTimer.addEventListener(egret.TimerEvent.TIMER, function() {
 			//改变分数
 			if(!this._isSpeedUp) {
-				this._score ++;
+				this._score++;
 				this._scoreTextField.text = "" + this._score;
+				this.plusScore(1);
 			}
 
 		}, this);
@@ -507,13 +507,13 @@ class Games extends egret.DisplayObjectContainer {
 				this._score++;
 				this._scoreTextField.text = "" + this._score;
 			}, this);
-			speedTimer.start();
-
-			var speed:number = egret.setTimeout(function(param){
+			speedTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, function() {
 				this.updateWord();	
 				this._isSpeedUp = false;
 				this._baseSpeed = 1;
-			}, this, 2000, "param");
+				this.plusScore(20);
+			}, this);
+			speedTimer.start();
 		}
 	}
 
@@ -598,7 +598,7 @@ class Games extends egret.DisplayObjectContainer {
 			gameChange.graphics.drawRect(0,0,this._stageW,this._stageH);
 			gameChange.graphics.endFill();
 
-			this.gameOver();
+			this.gameOverSubmitScore();
 			//test
 			// this._normalAlert = new Alert(Alert.GamePageScore, ""+this._score, ""+this._score, "1", 0,this._stageW,this._stageH);
 			// this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
@@ -620,7 +620,9 @@ class Games extends egret.DisplayObjectContainer {
         request.send();
         request.addEventListener(egret.Event.COMPLETE, function() {
 			let result = JSON.parse(request.response);
+			console.log(result);
             if (result["code"] == 0) {
+				this._info._rands = result["data"]["rands"];
 				//减次数成功
 				this.getWords(1);
 				
@@ -655,7 +657,7 @@ class Games extends egret.DisplayObjectContainer {
 	private getWords(type:number) {
 		let params = "?vuid=" + this._info._vuid + 
 					 "&key=" + this._info._key +
-					 "&rands=9" + "&isfrom=1";
+					"&rands=" + this._info._rands + "&isfrom=1";
 		// let params = "?vuid=6&key=296aab45fdcfc1695ef7f1202893f461&rands=9&isfrom=1";
 		let request = new egret.HttpRequest();
         request.responseType = egret.HttpResponseType.TEXT;
@@ -684,12 +686,34 @@ class Games extends egret.DisplayObjectContainer {
         }, this);
 	}
 	
+	//接口-增加分数
+	private plusScore(score: number) {
+		let params = "?vuid=" + this._info._vuid + 
+					 "&rands=" + this._info._rands + 
+					 "&tid=" + this._tid + 
+					 "&md5=" + score + 
+					 "&timenum=" + this._info._timenum + 
+					 "&activitynum=" + this._info._activitynum + 
+					 "&isfrom=" + this._info._isfrom;
+		let request = new egret.HttpRequest();
+        request.responseType = egret.HttpResponseType.TEXT;
+        request.open(this._info._typosTempjump+params, egret.HttpMethod.GET);
+        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        request.send();
+		request.addEventListener(egret.Event.COMPLETE, function() {
+			let result = JSON.parse(request.response);
+		}, this);
+		request.addEventListener(egret.IOErrorEvent.IO_ERROR, function() {
+            // alert("typostempjump　post error : " + event);
+        }, this);
+	}
+
 	//接口-游戏结束
-    private gameOver() {
+    private gameOverSubmitScore() {
         var params = "?score=" + this._score + 
 					 "&vuid=" + this._info._vuid +
 					 "&key=" + this._info._key + 
-					 "&rands=" + this._rands + 
+					 "&rands=" + this._info._rands + 
 					 "&timenum=" + this._info._timenum + 
 					 "&activitynum=" + this._info._activitynum + 
 					 "&isfrom=" + this._info._isfrom;
@@ -697,8 +721,12 @@ class Games extends egret.DisplayObjectContainer {
         request.responseType = egret.HttpResponseType.TEXT;
         request.open(this._info._gameover + params, egret.HttpMethod.GET);
         request.send();
+		console.log(this._info._gameover + params);
+
 		request.addEventListener(egret.Event.COMPLETE, function() {
 			let result = JSON.parse(request.response);
+			console.log(result);
+
 			let highScore = result["data"]["score"];
 			if(this._score > parseInt(highScore)){
 				highScore = this._score;
