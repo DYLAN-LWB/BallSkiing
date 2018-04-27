@@ -23,31 +23,41 @@ class Alert extends egret.Sprite {
         this.screenwith = screenwith;
         this.screenHeight = screenHeight;
         
+        console.log(this.score,score);
         this.initView();
     }
 
     public initView() {
         var bg;
-        // if(this.type == 3){
-        //     bg = new Bitmap("black2_png");
-        // } else {
+        if(this.type == 3){
             bg = new Bitmap("black_png");
-        // }
-        bg.height = this.screenHeight;
-        bg.width = this.screenwith;
-        bg.y = 0;
+        } else {
+            bg = new Bitmap("black_png");
+        }
+        
+        //屏幕适配
+        var ua = window.navigator.userAgent.toLowerCase();
+        if(ua.match(/MicroMessenger/i) == 'micromessenger'){    //微信
 
-        // if(this.type == 2){
-        //     bg.x = -250;
-		//     bg.y = 100;
-        //     bg.height = this.screenwith;
-        //     bg.width = this.screenHeight;
-        // }
-        // if(this.type == 3){
-        //     bg.height = this.screenwith;
-        //     bg.width = this.screenHeight;
-        // }
+            if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) { //判断iPhone|iPad|iPod|iOS
+                        bg.height = 1218;
+                        bg.width = 750;
+                        } else if (/(Android)/i.test(navigator.userAgent)) {  //判断Android
+                            bg.height = 1196;
+                            bg.width = 750;  
+                        }
+        } else {
+            if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) { //判断iPhone|iPad|iPod|iOS
+                        bg.height = 1218;
+                        bg.width = 750;
+            } else if (/(Android)/i.test(navigator.userAgent)) {  //判断Android
+                        bg.height = 1298;
+                        bg.width = 750;  
+            }
+        }
+        bg.touchEnabled = true;
         this.addChild(bg);
+
 
         
         switch (this.type) {

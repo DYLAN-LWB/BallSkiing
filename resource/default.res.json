@@ -1,7 +1,7 @@
 {
 	"groups": [
 		{
-			"keys": "description_json,countdown_mp3,bg_mp3,eat_mp3,gamebody_json,Eword_json,ball_png,tree_png,speed_json,speed_png,boom_mp3,speedup_mp3,attention_png,shareGui_png",
+			"keys": "description_json,countdown_mp3,bg_mp3,eat_mp3,gamebody_json,Eword_json,ball_png,tree_png,speed_json,speed_png,boom_mp3,speedup_mp3,attention_png,shareGui_png,black_png",
 			"name": "preload"
 		}
 	],
@@ -88,6 +88,11 @@
 			"name": "shareGui_png",
 			"type": "image",
 			"url": "game/shareGui.png"
+		},
+		{
+			"name": "black_png",
+			"type": "image",
+			"url": "game/black.png"
 		}
 	]
 }

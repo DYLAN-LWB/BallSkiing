@@ -545,14 +545,11 @@ var Games = (function (_super) {
         }, this, 250);
         egret.setTimeout(function () {
             gameChange.graphics.clear();
-            gameChange.graphics.beginFill(0x000000, 0.6);
-            gameChange.graphics.drawRect(0, 0, this._stageW, this._stageH);
-            gameChange.graphics.endFill();
-            this.gameOverSubmitScore();
+            // this.gameOverSubmitScore();
             //test
-            // this._normalAlert = new Alert(Alert.GamePageScore, ""+this._score, ""+this._score, "1", 0,this._stageW,this._stageH);
-            // this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
-            // this.addChild(this._normalAlert);
+            this._normalAlert = new Alert(Alert.GamePageScore, "" + this._score, "" + this._score, "1", 0, this._stageW, this._stageH);
+            this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
+            this.addChild(this._normalAlert);
         }, this, 300);
     };
     //接口-减游戏次数
@@ -575,15 +572,6 @@ var Games = (function (_super) {
                 this.getWords(1);
             }
             else if (result["code"] == 2) {
-                var gameChange = new egret.Sprite();
-                gameChange.x = 0;
-                gameChange.y = 0;
-                gameChange.width = this._stageW;
-                gameChange.height = this._stageH;
-                gameChange.graphics.beginFill(0x000000, 0.6);
-                gameChange.graphics.drawRect(0, 0, this._stageW, this._stageH);
-                gameChange.graphics.endFill();
-                this.addChild(gameChange);
                 var _overAlert = new Alert(Alert.GamePageShare, "", "", "", 0, this._stageW, this._stageH);
                 _overAlert.addEventListener(AlertEvent.Share, this.shareButtonClick, this);
                 _overAlert.addEventListener(AlertEvent.Cancle, function () {
