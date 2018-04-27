@@ -16,6 +16,7 @@ class Games extends egret.DisplayObjectContainer {
 	private _score = 0;	//分数
 	private _gameTimer: egret.Timer;	//游戏计时器
 
+	private _gameGuide;
 	private _ball = new egret.Sprite();	//小球
 	private _moveToRight:boolean = true;	//小球是否在向右移动
 	private _ballY = 400;
@@ -176,21 +177,60 @@ class Games extends egret.DisplayObjectContainer {
 		//背景添加对象
 		this.addBarriers(1);
 
-		
-
 		//设置轨迹点初始位置
 		this._lastLocusPointX = this._stageW/2;
 		this._lastLocusPointY = this._ballY;
 
+		//添加游戏引导
+		this._gameGuide = new egret.Sprite();
+		this._gameGuide.x = 0;
+		this._gameGuide.y = 0;
+		this._gameGuide.width = this._stageW;
+		this._gameGuide.height = this._stageH;
+		this._gameGuide.graphics.beginFill(0x000000,0.6);
+		this._gameGuide.graphics.drawRect(0,0,this._stageW,this._stageH);
+		this._gameGuide.graphics.endFill();
+		this.addChild(this._gameGuide);
 
-		var startTimer: egret.Timer = new egret.Timer(1000, 3);
-		startTimer.addEventListener(egret.TimerEvent.TIMER, function() {
+		let howPlay  = new egret.TextField;
+		howPlay.x = 0;
+		howPlay.y = 620;
+		howPlay.width = this._stageW;
+		howPlay.height = 50;
+		howPlay.textColor = 0xffffff;
+		howPlay.verticalAlign = egret.VerticalAlign.MIDDLE;
+		howPlay.textAlign = egret.HorizontalAlign.CENTER;
+		howPlay.size = 25;
+		howPlay.text = "温馨提示：单击屏幕改变方向";
+		howPlay.fontFamily = "Microsoft YaHei";
+		this._gameGuide.addChild(howPlay);
 
-		}, this);
-		startTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, function() {
+		let sound:egret.Sound = RES.getRes("countdown_mp3");
+		var music = sound.play(0,1);
+		music.volume = 0.4;
+
+		let countDownImg  = new Bitmap("count_3_png");
+		countDownImg.x = this._stageW/2-80;
+		countDownImg.y = 350;
+		countDownImg.width = 160;
+		countDownImg.height = 198;
+		this._gameGuide.addChild(countDownImg);
+
+		egret.setTimeout(function() {
+			countDownImg.texture = RES.getRes("count_2_png");
+		}, this, 1000);
+
+		egret.setTimeout(function() {
+			countDownImg.texture = RES.getRes("count_1_png");
+			let sound:egret.Sound = RES.getRes("readygo_mp3");
+			var music = sound.play(0,1);
+			music.volume = 0.4;
+		}, this, 2000);
+
+		egret.setTimeout(function() {
+			this.removeChild(this._gameGuide);
 			this.startGame();
-		}, this);
-        startTimer.start();
+		}, this, 3000);
 	}
 
 	private startGame() {
