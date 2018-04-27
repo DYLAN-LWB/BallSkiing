@@ -228,13 +228,13 @@ var Games = (function (_super) {
             //碰撞块
             var hitObject = new egret.Sprite;
             hitObject.width = 20;
-            hitObject.height = 40;
+            hitObject.height = 30;
             hitObject.anchorOffsetX = hitObject.width / 2;
             hitObject.anchorOffsetY = hitObject.height / 2;
             hitObject.x = 20;
             hitObject.y = treeBg.height - 15;
             hitObject.graphics.beginFill(0xff0000, 0.001);
-            hitObject.graphics.drawRect(0, 0, 20, 40);
+            hitObject.graphics.drawRect(0, 0, 20, 30);
             hitObject.graphics.endFill();
             hitObject.name = "hit";
             treeBg.addChild(hitObject);
@@ -451,7 +451,7 @@ var Games = (function (_super) {
             this.plusScore(20);
             egret.setTimeout(function () {
                 this.updateWord();
-            }, this, 2000);
+            }, this, 3000);
             //改变分数
             // let speedTimer = new egret.Timer(100, 20);
             // speedTimer.addEventListener(egret.TimerEvent.TIMER, function() {

@@ -257,13 +257,13 @@ class Games extends egret.DisplayObjectContainer {
 			//碰撞块
 			let hitObject = new egret.Sprite;
 			hitObject.width = 20;
-			hitObject.height = 40;
+			hitObject.height = 30;
 			hitObject.anchorOffsetX = hitObject.width/2;
 			hitObject.anchorOffsetY = hitObject.height/2;
 			hitObject.x = 20;
 			hitObject.y = treeBg.height - 15;
 			hitObject.graphics.beginFill(0xff0000,0.001);
-			hitObject.graphics.drawRect(0,0,20,40);
+			hitObject.graphics.drawRect(0,0,20,30);
 			hitObject.graphics.endFill();
 			hitObject.name = "hit";
 			treeBg.addChild(hitObject);
