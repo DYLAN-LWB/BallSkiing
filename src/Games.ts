@@ -53,21 +53,21 @@ class Games extends egret.DisplayObjectContainer {
 		this._stageW = this.stage.stageWidth;
 		this._stageH = this.stage.stageHeight;
 
-		// this._info._vuid = localStorage.getItem("vuid").replace(/"/g,"");
-		// this._info._key = localStorage.getItem("key").replace(/"/g,"");
-		// this._info._isfrom = localStorage.getItem("isfrom").replace(/"/g,"");
-		// this._info._timenum = localStorage.getItem("timenum").replace(/"/g,"");
-		// this._info._activitynum = localStorage.getItem("activitynum").replace(/"/g,"");
+		this._info._vuid = localStorage.getItem("vuid").replace(/"/g,"");
+		this._info._key = localStorage.getItem("key").replace(/"/g,"");
+		this._info._isfrom = localStorage.getItem("isfrom").replace(/"/g,"");
+		this._info._timenum = localStorage.getItem("timenum").replace(/"/g,"");
+		this._info._activitynum = localStorage.getItem("activitynum").replace(/"/g,"");
 
-		// this.minusGameCount();
+		this.minusGameCount();
 
 		//test
-		this._info._vuid = "6";
-		this._info._key = "296aab45fdcfc1695ef7f1202893f461";
-		this._info._isfrom = "1";
-		this._info._timenum = "1";
-		this._info._activitynum = "9";
-		this.getWords(1);
+		// this._info._vuid = "6";
+		// this._info._key = "296aab45fdcfc1695ef7f1202893f461";
+		// this._info._isfrom = "1";
+		// this._info._timenum = "1";
+		// this._info._activitynum = "9";
+		// this.getWords(1);
 	}
 
 	private setupViews() {
