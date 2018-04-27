@@ -70,15 +70,6 @@ class Games extends egret.DisplayObjectContainer {
 	}
 
 	private setupViews() {
-		//添加触摸事件
-		this.stage.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.touchBegin, this);
-		//添加帧事件
-		this.addEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
-
-		//背景音乐
-		let bgSound = RES.getRes("bg_mp3");
-		this._bgMusic = bgSound.play();
-		this._bgMusic.volume = 0.4;
 
 		//添加轨迹背景1
 		this._gameBg1 = new egret.Sprite();
@@ -179,6 +170,46 @@ class Games extends egret.DisplayObjectContainer {
 		this._scoreTextField.fontFamily = "Microsoft YaHei";
 		this.addChild(this._scoreTextField);
 
+		//初次更新单词
+		this.updateWord();
+
+		//背景添加对象
+		this.addBarriers(1);
+
+		
+
+		//设置轨迹点初始位置
+		this._lastLocusPointX = this._stageW/2;
+		this._lastLocusPointY = this._ballY;
+
+
+		var startTimer: egret.Timer = new egret.Timer(1000, 3);
+		startTimer.addEventListener(egret.TimerEvent.TIMER, function() {
+
+		}, this);
+		startTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, function() {
+			this.startGame();
+		}, this);
+        startTimer.start();
+	}
+
+	private startGame() {
+		//添加触摸事件
+		this.stage.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.touchBegin, this);
+		//添加帧事件
+		this.addEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
+
+		//背景音乐
+		let bgSound = RES.getRes("bg_mp3");
+		this._bgMusic = bgSound.play();
+		this._bgMusic.volume = 0.4;
+
+		egret.setTimeout(function(){
+			this._isFitstApperar = false;
+			this.addBarriers(2);
+		},this,50);
+
+		//游戏计时器
 		this._gameTimer = new egret.Timer(1000, 99999);
 		this._gameTimer.addEventListener(egret.TimerEvent.TIMER, function() {
 			//改变分数
@@ -190,18 +221,6 @@ class Games extends egret.DisplayObjectContainer {
 
 		}, this);
         this._gameTimer.start();
-
-		//初次更新单词
-		this.updateWord();
-
-		//背景添加对象
-		this.addBarriers(1);
-		this._isFitstApperar = false;
-		this.addBarriers(2);
-
-		//设置轨迹点初始位置
-		this._lastLocusPointX = this._stageW/2;
-		this._lastLocusPointY = this._ballY;
 	}
 
 	//更新单词
@@ -238,11 +257,11 @@ class Games extends egret.DisplayObjectContainer {
 		if(this._score > 300) this._baseTreeNum = 23;
 		if(this._score > 350) this._baseTreeNum = 28;
 
-		for(var i = 0; i < ((this._isFitstApperar ? 2 : this._baseTreeNum)+Math.random()*5); i++) {
+		for(var i = 0; i < ((this._isFitstApperar ? 1 : this._baseTreeNum)+Math.random()*5); i++) {
 			//背景
 			let treeBg = new egret.Sprite;
 			treeBg.x = Math.random()*(this._stageW-80);
-			treeBg.y = Math.random()*(this._stageH-80-(this._isFitstApperar ? 700 : 0)) + (this._isFitstApperar ? 700 : 0);
+			treeBg.y = Math.random()*(this._stageH-80-(this._isFitstApperar ? 800 : 0)) + (this._isFitstApperar ? 800 : 0);
 			treeBg.width = 80;
 			treeBg.height = 80;
 

@@ -55,14 +55,6 @@ var Games = (function (_super) {
         this.getWords(1);
     };
     Games.prototype.setupViews = function () {
-        //添加触摸事件
-        this.stage.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.touchBegin, this);
-        //添加帧事件
-        this.addEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
-        //背景音乐
-        var bgSound = RES.getRes("bg_mp3");
-        this._bgMusic = bgSound.play();
-        this._bgMusic.volume = 0.4;
         //添加轨迹背景1
         this._gameBg1 = new egret.Sprite();
         this._gameBg1.x = 0;
@@ -153,6 +145,35 @@ var Games = (function (_super) {
         this._scoreTextField.text = "0";
         this._scoreTextField.fontFamily = "Microsoft YaHei";
         this.addChild(this._scoreTextField);
+        //初次更新单词
+        this.updateWord();
+        //背景添加对象
+        this.addBarriers(1);
+        //设置轨迹点初始位置
+        this._lastLocusPointX = this._stageW / 2;
+        this._lastLocusPointY = this._ballY;
+        var startTimer = new egret.Timer(1000, 3);
+        startTimer.addEventListener(egret.TimerEvent.TIMER, function () {
+        }, this);
+        startTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, function () {
+            this.startGame();
+        }, this);
+        startTimer.start();
+    };
+    Games.prototype.startGame = function () {
+        //添加触摸事件
+        this.stage.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.touchBegin, this);
+        //添加帧事件
+        this.addEventListener(egret.Event.ENTER_FRAME, this.frameObserve, this);
+        //背景音乐
+        var bgSound = RES.getRes("bg_mp3");
+        this._bgMusic = bgSound.play();
+        this._bgMusic.volume = 0.4;
+        egret.setTimeout(function () {
+            this._isFitstApperar = false;
+            this.addBarriers(2);
+        }, this, 50);
+        //游戏计时器
         this._gameTimer = new egret.Timer(1000, 99999);
         this._gameTimer.addEventListener(egret.TimerEvent.TIMER, function () {
             //改变分数
@@ -163,15 +184,6 @@ var Games = (function (_super) {
             // }
         }, this);
         this._gameTimer.start();
-        //初次更新单词
-        this.updateWord();
-        //背景添加对象
-        this.addBarriers(1);
-        this._isFitstApperar = false;
-        this.addBarriers(2);
-        //设置轨迹点初始位置
-        this._lastLocusPointX = this._stageW / 2;
-        this._lastLocusPointY = this._ballY;
     };
     //更新单词
     Games.prototype.updateWord = function () {
@@ -211,11 +223,11 @@ var Games = (function (_super) {
             this._baseTreeNum = 23;
         if (this._score > 350)
             this._baseTreeNum = 28;
-        for (var i = 0; i < ((this._isFitstApperar ? 2 : this._baseTreeNum) + Math.random() * 5); i++) {
+        for (var i = 0; i < ((this._isFitstApperar ? 1 : this._baseTreeNum) + Math.random() * 5); i++) {
             //背景
             var treeBg = new egret.Sprite;
             treeBg.x = Math.random() * (this._stageW - 80);
-            treeBg.y = Math.random() * (this._stageH - 80 - (this._isFitstApperar ? 700 : 0)) + (this._isFitstApperar ? 700 : 0);
+            treeBg.y = Math.random() * (this._stageH - 80 - (this._isFitstApperar ? 800 : 0)) + (this._isFitstApperar ? 800 : 0);
             treeBg.width = 80;
             treeBg.height = 80;
             //树
@@ -545,11 +557,11 @@ var Games = (function (_super) {
         }, this, 250);
         egret.setTimeout(function () {
             gameChange.graphics.clear();
-            // this.gameOverSubmitScore();
+            this.gameOverSubmitScore();
             //test
-            this._normalAlert = new Alert(Alert.GamePageScore, "" + this._score, "" + this._score, "1", 0, this._stageW, this._stageH);
-            this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
-            this.addChild(this._normalAlert);
+            // this._normalAlert = new Alert(Alert.GamePageScore, ""+this._score, ""+this._score, "1", 0,this._stageW,this._stageH);
+            // this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
+            // this.addChild(this._normalAlert);
         }, this, 300);
     };
     //接口-减游戏次数
