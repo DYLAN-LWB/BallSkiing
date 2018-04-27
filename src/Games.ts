@@ -39,7 +39,7 @@ class Games extends egret.DisplayObjectContainer {
 	private _barrierArray2 = [];	//障碍物数组
 	private _letterBgArray1 = [];	//字符数组
 	private _letterBgArray2 = [];	//字符数组
-	private _randomTreeNum = 5;
+	private _baseTreeNum = 3;
 
 	private _wordsArray = [];	//单词数组
 	private _wordTextField;		//显示的单词
@@ -52,21 +52,21 @@ class Games extends egret.DisplayObjectContainer {
 		this._stageW = this.stage.stageWidth;
 		this._stageH = this.stage.stageHeight;
 
-		this._info._vuid = localStorage.getItem("vuid").replace(/"/g,"");
-		this._info._key = localStorage.getItem("key").replace(/"/g,"");
-		this._info._isfrom = localStorage.getItem("isfrom").replace(/"/g,"");
-		this._info._timenum = localStorage.getItem("timenum").replace(/"/g,"");
-		this._info._activitynum = localStorage.getItem("activitynum").replace(/"/g,"");
+		// this._info._vuid = localStorage.getItem("vuid").replace(/"/g,"");
+		// this._info._key = localStorage.getItem("key").replace(/"/g,"");
+		// this._info._isfrom = localStorage.getItem("isfrom").replace(/"/g,"");
+		// this._info._timenum = localStorage.getItem("timenum").replace(/"/g,"");
+		// this._info._activitynum = localStorage.getItem("activitynum").replace(/"/g,"");
 
-		this.minusGameCount();
+		// this.minusGameCount();
 
 		//test
-		// this._info._vuid = "6";
-		// this._info._key = "296aab45fdcfc1695ef7f1202893f461";
-		// this._info._isfrom = "1";
-		// this._info._timenum = "1";
-		// this._info._activitynum = "9";
-		// this.getWords(1);
+		this._info._vuid = "6";
+		this._info._key = "296aab45fdcfc1695ef7f1202893f461";
+		this._info._isfrom = "1";
+		this._info._timenum = "1";
+		this._info._activitynum = "9";
+		this.getWords(1);
 	}
 
 	private setupViews() {
@@ -78,7 +78,7 @@ class Games extends egret.DisplayObjectContainer {
 		//背景音乐
 		let bgSound = RES.getRes("bg_mp3");
 		this._bgMusic = bgSound.play();
-		this._bgMusic.volume = 0.7;
+		this._bgMusic.volume = 0.4;
 
 		//添加轨迹背景1
 		this._gameBg1 = new egret.Sprite();
@@ -125,13 +125,13 @@ class Games extends egret.DisplayObjectContainer {
 
 		//单词
 		this._wordTextField  = new egret.TextField;
-		this._wordTextField.x = 0;
+		this._wordTextField.x = 30;
 		this._wordTextField.y = 30;
-		this._wordTextField.width = this._stageW/2;
+		this._wordTextField.width = this._stageW/2-30;
 		this._wordTextField.height = 50;
-		this._wordTextField.textColor = 0xffa340;
+		this._wordTextField.textColor = 0x7ed7de;
 		this._wordTextField.verticalAlign = egret.VerticalAlign.MIDDLE;
-		this._wordTextField.textAlign = egret.HorizontalAlign.CENTER;
+		this._wordTextField.textAlign = egret.HorizontalAlign.LEFT;
 		this._wordTextField.size = 35;
 		this._wordTextField.text = "";
 		this._wordTextField.fontFamily = "Microsoft YaHei";
@@ -139,13 +139,14 @@ class Games extends egret.DisplayObjectContainer {
 
 		//翻译
 		this._translateTextField  = new egret.TextField;
-		this._translateTextField.x = 0;
-		this._translateTextField.y = 80;
-		this._translateTextField.width = this._stageW/2;
-		this._translateTextField.height = 100;
+		this._translateTextField.x = 30;
+		this._translateTextField.y = 90;
+		this._translateTextField.width = this._stageW/2-30;
+		this._translateTextField.height = 120;
 		this._translateTextField.textColor = 0xffa340;
 		this._translateTextField.verticalAlign = egret.VerticalAlign.TOP;
-		this._translateTextField.textAlign = egret.HorizontalAlign.CENTER;
+		this._translateTextField.textAlign = egret.HorizontalAlign.LEFT;
+		this._translateTextField.lineSpacing = 10;
 		this._translateTextField.size = 30;
 		this._translateTextField.text = "";
 		this._translateTextField.fontFamily = "Microsoft YaHei";
@@ -153,9 +154,9 @@ class Games extends egret.DisplayObjectContainer {
 
 		//分数
 		let _scoreText  = new egret.TextField;
-		_scoreText.x = this._stageW/2;
+		_scoreText.x = this._stageW*0.75;
 		_scoreText.y = 30;
-		_scoreText.width = this._stageW/2;
+		_scoreText.width = this._stageW*0.25;
 		_scoreText.height = 50;
 		_scoreText.textColor = 0x7ed7de;
 		_scoreText.verticalAlign = egret.VerticalAlign.MIDDLE;
@@ -166,14 +167,14 @@ class Games extends egret.DisplayObjectContainer {
 		this.addChild(_scoreText);
 
 		this._scoreTextField  = new egret.TextField;
-		this._scoreTextField.x = this._stageW/2;
+		this._scoreTextField.x = this._stageW*0.75;
 		this._scoreTextField.y = 80;
-		this._scoreTextField.width = this._stageW/2;
+		this._scoreTextField.width = this._stageW*0.25;
 		this._scoreTextField.height = 50;
 		this._scoreTextField.textColor = 0x7ed7de;
 		this._scoreTextField.verticalAlign = egret.VerticalAlign.MIDDLE;
 		this._scoreTextField.textAlign = egret.HorizontalAlign.CENTER;
-		this._scoreTextField.size = 35;
+		this._scoreTextField.size = 40;
 		this._scoreTextField.text = "0";
 		this._scoreTextField.fontFamily = "Microsoft YaHei";
 		this.addChild(this._scoreTextField);
@@ -181,11 +182,11 @@ class Games extends egret.DisplayObjectContainer {
 		this._gameTimer = new egret.Timer(1000, 99999);
 		this._gameTimer.addEventListener(egret.TimerEvent.TIMER, function() {
 			//改变分数
-			if(!this._isSpeedUp) {
+			// if(!this._isSpeedUp) {
 				this._score++;
 				this._scoreTextField.text = "" + this._score;
 				this.plusScore(1);
-			}
+			// }
 
 		}, this);
         this._gameTimer.start();
@@ -229,15 +230,15 @@ class Games extends egret.DisplayObjectContainer {
 			this._letterBgArray2.splice(0, this._letterBgArray2.length);
 		}
 
-		if(this._score > 50) this._randomTreeNum = 10;
-		if(this._score > 100) this._randomTreeNum = 15;
-		if(this._score > 150) this._randomTreeNum = 20;
-		if(this._score > 200) this._randomTreeNum = 25;
-		if(this._score > 250) this._randomTreeNum = 30;
-		if(this._score > 300) this._randomTreeNum = 40;
-		if(this._score > 350) this._randomTreeNum = 50;
+		if(this._score > 50) this._baseTreeNum = 6;
+		if(this._score > 100) this._baseTreeNum = 9;
+		if(this._score > 150) this._baseTreeNum = 12;
+		if(this._score > 200) this._baseTreeNum = 15;
+		if(this._score > 250) this._baseTreeNum = 18;
+		if(this._score > 300) this._baseTreeNum = 23;
+		if(this._score > 350) this._baseTreeNum = 28;
 
-		for(var i = 0; i < ((this._isFitstApperar ? 2 : 5)+Math.random()*this._randomTreeNum); i++) {
+		for(var i = 0; i < ((this._isFitstApperar ? 2 : this._baseTreeNum)+Math.random()*5); i++) {
 			//背景
 			let treeBg = new egret.Sprite;
 			treeBg.x = Math.random()*(this._stageW-80);
@@ -485,35 +486,45 @@ class Games extends egret.DisplayObjectContainer {
 
 		let sound:egret.Sound = RES.getRes("eat_mp3");
 		var music = sound.play(0,1);
-		music.volume = 0.7;
+		music.volume = 0.4;
 
 		let text = tf["name"];
 		if(text == this._missLetter) {
-			let sound:egret.Sound = RES.getRes("speedup_mp3");
-			var music = sound.play(0,1);
-			music.volume = 0.7;
+
+			// let sound:egret.Sound = RES.getRes("speedup_mp3");
+			// var music = sound.play(0,1);
+			// music.volume = 0.4;
 
 			this._wordTextField.text = this._wordTextField.text.replace("( )","("+ text + ")");
 
+			//读单词
 			let playWord = this._wordTextField.text.replace("(","");
 			playWord = playWord.replace(")","");
 			this.playTheWord(playWord);
 
-			this._isSpeedUp = true;
-			this._baseSpeed = 1.7;
+			// this._isSpeedUp = true;
+			// this._baseSpeed = 1;
+			//加20分
+			this._score += 20;
+			this._scoreTextField.text = "" + this._score;
+			this.plusScore(20);
+			egret.setTimeout(function() {
+				this.updateWord();
+			}, this, 3000);
+
 			//改变分数
-			let speedTimer = new egret.Timer(100, 20);
-			speedTimer.addEventListener(egret.TimerEvent.TIMER, function() {
-				this._score++;
-				this._scoreTextField.text = "" + this._score;
-			}, this);
-			speedTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, function() {
-				this.updateWord();	
-				this._isSpeedUp = false;
-				this._baseSpeed = 1;
-				this.plusScore(20);
-			}, this);
-			speedTimer.start();
+			// let speedTimer = new egret.Timer(100, 20);
+			// speedTimer.addEventListener(egret.TimerEvent.TIMER, function() {
+			// 	this._score++;
+			// 	this._scoreTextField.text = "" + this._score;
+			// }, this);
+			// speedTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, function() {
+			// 	this.updateWord();	
+			// 	this._isSpeedUp = false;
+			// 	this._baseSpeed = 1;
+			// 	this.plusScore(20);
+			// }, this);
+			// speedTimer.start();
 		}
 	}
 
@@ -528,14 +539,22 @@ class Games extends egret.DisplayObjectContainer {
 			success : function(D){
 				console.log(D);
 				if(D.baesInfo.symbols) {
-					document.getElementById("word").volume = 1;
+					var audio = document.getElementById("word");
+					audio.volume = 1;
 					if(D.baesInfo.symbols[0].ph_am_mp3) {
-						document.getElementById('word').setAttribute('src', D.baesInfo.symbols[0].ph_am_mp3);
-						document.getElementById('word').play();
+						audio.setAttribute('src', D.baesInfo.symbols[0].ph_am_mp3);
 					} else if(D.baesInfo.symbols[0].ph_en_mp3) {
-						document.getElementById('word').setAttribute('src', D.baesInfo.symbols[0].ph_en_mp3);
-						document.getElementById('word').play();
+						audio.setAttribute('src', D.baesInfo.symbols[0].ph_en_mp3);
 					}
+					audio.play();
+					var playNum = 0;
+					audio.addEventListener("ended",function() {
+						playNum++;
+						if (playNum < 3) {
+							audio.play();
+						}
+						
+					});
 				}				
 			},
 			error:function(data){
@@ -554,7 +573,7 @@ class Games extends egret.DisplayObjectContainer {
 
 		let sound:egret.Sound = RES.getRes("boom_mp3");
 		var music = sound.play(0,1);
-		music.volume = 0.7;
+		music.volume = 0.4;
 
 		//改变背景
 		let gameChange = new egret.Sprite();
@@ -726,16 +745,18 @@ class Games extends egret.DisplayObjectContainer {
 		request.addEventListener(egret.Event.COMPLETE, function() {
 			let result = JSON.parse(request.response);
 			console.log(result);
-
-			let highScore = result["data"]["score"];
-			if(this._score > parseInt(highScore)){
-				highScore = this._score;
+			if (result["code"] == 0) {
+				let highScore = result["data"]["score"];
+				if(this._score > parseInt(highScore)){
+					highScore = this._score;
+				}
+				this._normalAlert = new Alert(Alert.GamePageScore, this._score.toString(), highScore,result["data"]["order"], result["data"]["text"],this._stageW,this._stageH);
+				this._normalAlert.addEventListener(AlertEvent.Ranking, this.checkRanking, this);
+				this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
+				this.addChild(this._normalAlert);
+			} else {
+				alert(result["msg"]);
 			}
-			this._normalAlert = new Alert(Alert.GamePageScore, this._score.toString(), highScore,result["data"]["order"], result["data"]["text"],this._stageW,this._stageH);
-			this._normalAlert.addEventListener(AlertEvent.Ranking, this.checkRanking, this);
-			this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
-			this.addChild(this._normalAlert);
-
 		}, this);
 		request.addEventListener(egret.IOErrorEvent.IO_ERROR, function() {
             alert("GameOver　post error : " + event);

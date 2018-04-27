@@ -1,7 +1,7 @@
 class Info  {
     // public  _url = "//www.beisu100.com/beisuapp/";	// 线上环境
-    // public _url = "//ceshi.beisu100.com/beisuapp/";	//测试环境
-    public _url = interface_url + "/beisuapp/";
+    public _url = "//ceshi.beisu100.com/beisuapp/";	//测试环境
+    // public _url = interface_url + "/beisuapp/";
 
     public _downnum           = this._url + "typos/numdown5";            //减游戏次数
     public _typosTempjump     = this._url + "typos/typostempjump";       //加分
