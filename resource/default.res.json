@@ -1,7 +1,7 @@
 {
 	"groups": [
 		{
-			"keys": "description_json,countdown_mp3,bg_mp3,eat_mp3,gamebody_json,Eword_json,ball_png,tree_png,speed_json,speed_png,boom_mp3,speedup_mp3,attention_png,shareGui_png,black_png,count_1_png,count_2_png,count_3_png,readygo_mp3",
+			"keys": "description_json,countdown_mp3,bg_mp3,eat_mp3,gamebody_json,Eword_json,ball_png,tree_png,speed_json,speed_png,boom_mp3,speedup_mp3,attention_png,shareGui_png,black_png,count_1_png,count_2_png,count_3_png,readygo_mp3,plus_png",
 			"name": "preload"
 		}
 	],
@@ -113,6 +113,11 @@
 			"name": "readygo_mp3",
 			"type": "sound",
 			"url": "sound/readygo.mp3"
+		},
+		{
+			"name": "plus_png",
+			"type": "image",
+			"url": "game/plus.png"
 		}
 	]
 }

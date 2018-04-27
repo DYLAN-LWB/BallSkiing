@@ -554,6 +554,19 @@ class Games extends egret.DisplayObjectContainer {
 			// var music = sound.play(0,1);
 			// music.volume = 0.4;
 
+			let countDownImg  = new Bitmap("plus_png");
+			countDownImg.x = this._ball.x;
+			countDownImg.y = this._ball.y;
+			countDownImg.width = 88;
+			countDownImg.height = 44;
+			this.addChild(countDownImg);
+
+			egret.Tween.get(countDownImg)
+			.to({x:this._stageW-110, y:90, scaleX: 0.3, scaleY:0.3}, 500)
+			.call(function(){
+				this.removeChild(countDownImg);
+			},this);
+
 			this._wordTextField.text = this._wordTextField.text.replace("( )","("+ text + ")");
 
 			//读单词

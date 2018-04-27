@@ -487,6 +487,17 @@ var Games = (function (_super) {
             // let sound:egret.Sound = RES.getRes("speedup_mp3");
             // var music = sound.play(0,1);
             // music.volume = 0.4;
+            var countDownImg_1 = new Bitmap("plus_png");
+            countDownImg_1.x = this._ball.x;
+            countDownImg_1.y = this._ball.y;
+            countDownImg_1.width = 88;
+            countDownImg_1.height = 44;
+            this.addChild(countDownImg_1);
+            egret.Tween.get(countDownImg_1)
+                .to({ x: this._stageW - 110, y: 90, scaleX: 0.3, scaleY: 0.3 }, 500)
+                .call(function () {
+                this.removeChild(countDownImg_1);
+            }, this);
             this._wordTextField.text = this._wordTextField.text.replace("( )", "(" + text + ")");
             //读单词
             var playWord = this._wordTextField.text.replace("(", "");
