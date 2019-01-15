@@ -34,10 +34,26 @@ var Games = (function (_super) {
         _this._letterBgArray2 = []; //字符数组
         _this._baseTreeNum = 3;
         _this._wordsArray = []; //单词数组
+        _this._isGameOver = false;
         _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.createGameScene, _this);
         return _this;
     }
     Games.prototype.createGameScene = function () {
+        //屏幕适配
+        // var ua = window.navigator.userAgent.toLowerCase();
+        // if(ua.match(/MicroMessenger/i) == 'micromessenger'){    //微信
+        //     if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) { //判断iPhone|iPad|iPod|iOS
+        //                 this.stage.setContentSize(750,1218);
+        //                 } else if (/(Android)/i.test(navigator.userAgent)) {  //判断Android
+        //                     this.stage.setContentSize(750,1196); 
+        //                 }
+        // } else {
+        //     if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) { //判断iPhone|iPad|iPod|iOS
+        //         this.stage.setContentSize(750,1218);
+        //     } else if (/(Android)/i.test(navigator.userAgent)) {  //判断Android
+        //         this.stage.setContentSize(750,1298);
+        //     }
+        // }
         this._stageW = this.stage.stageWidth;
         this._stageH = this.stage.stageHeight;
         // this._info._vuid = localStorage.getItem("vuid").replace(/"/g,"");
@@ -45,14 +61,40 @@ var Games = (function (_super) {
         // this._info._isfrom = localStorage.getItem("isfrom").replace(/"/g,"");
         // this._info._timenum = localStorage.getItem("timenum").replace(/"/g,"");
         // this._info._activitynum = localStorage.getItem("activitynum").replace(/"/g,"");
-        // this.minusGameCount();
         //test
-        this._info._vuid = "6";
-        this._info._key = "296aab45fdcfc1695ef7f1202893f461";
+        this._info._vuid = "11";
+        this._info._key = "ce8dfcb5e99937d6ec58765a0c940916";
         this._info._isfrom = "1";
         this._info._timenum = "1";
         this._info._activitynum = "9";
         this.getWords(1);
+    };
+    //接口-请求单词
+    Games.prototype.getWords = function (type) {
+        var params = "?vuid=" + this._info._vuid +
+            "&key=" + this._info._key + "&isfrom=1";
+        var request = new egret.HttpRequest();
+        request.responseType = egret.HttpResponseType.TEXT;
+        request.open(this._info._getWord + params, egret.HttpMethod.GET);
+        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        request.send();
+        request.addEventListener(egret.Event.COMPLETE, function () {
+            var result = JSON.parse(request.response);
+            if (result["code"] == 0) {
+                for (var i = 0; i < result["data"].length; i++) {
+                    var dict = result["data"][i];
+                    this._wordsArray.push(dict);
+                }
+                if (type == 1) {
+                    this.setupViews();
+                }
+            }
+            else {
+                alert(result["msg"]);
+            }
+        }, this);
+        request.addEventListener(egret.IOErrorEvent.IO_ERROR, function () {
+        }, this);
     };
     Games.prototype.setupViews = function () {
         //添加轨迹背景1
@@ -487,6 +529,7 @@ var Games = (function (_super) {
             // let sound:egret.Sound = RES.getRes("speedup_mp3");
             // var music = sound.play(0,1);
             // music.volume = 0.4;
+            this._missLetter = "none";
             var countDownImg_1 = new Bitmap("plus_png");
             countDownImg_1.x = this._ball.x;
             countDownImg_1.y = this._ball.y;
@@ -494,7 +537,7 @@ var Games = (function (_super) {
             countDownImg_1.height = 44;
             this.addChild(countDownImg_1);
             egret.Tween.get(countDownImg_1)
-                .to({ x: this._stageW - 110, y: 90, scaleX: 0.3, scaleY: 0.3 }, 500)
+                .to({ x: this._stageW - 110, y: 90, scaleX: 0.3, scaleY: 0.3 }, 700)
                 .call(function () {
                 this.removeChild(countDownImg_1);
             }, this);
@@ -570,6 +613,7 @@ var Games = (function (_super) {
             this._gameTimer.stop();
         if (this._bgMusic)
             this._bgMusic.stop();
+        document.getElementById("word").pause();
         var sound = RES.getRes("boom_mp3");
         var music = sound.play(0, 1);
         music.volume = 0.4;
@@ -612,127 +656,60 @@ var Games = (function (_super) {
             // this.addChild(this._normalAlert);
         }, this, 300);
     };
-    //接口-减游戏次数
-    Games.prototype.minusGameCount = function () {
-        var params = "?vuid=" + this._info._vuid +
-            "&key=" + this._info._key +
-            "&timenum=" + this._info._timenum +
-            "&activitynum=" + this._info._activitynum +
-            "&isfrom=" + this._info._isfrom;
-        var request = new egret.HttpRequest();
-        request.responseType = egret.HttpResponseType.TEXT;
-        request.open(this._info._downnum + params, egret.HttpMethod.GET);
-        request.send();
-        request.addEventListener(egret.Event.COMPLETE, function () {
-            var result = JSON.parse(request.response);
-            console.log(result);
-            if (result["code"] == 0) {
-                this._info._rands = result["data"]["rands"];
-                //减次数成功
-                this.getWords(1);
-            }
-            else if (result["code"] == 2) {
-                var _overAlert = new Alert(Alert.GamePageShare, "", "", "", 0, this._stageW, this._stageH);
-                _overAlert.addEventListener(AlertEvent.Share, this.shareButtonClick, this);
-                _overAlert.addEventListener(AlertEvent.Cancle, function () {
-                    window.location.href = "../index.html";
-                }, this);
-                this.addChild(_overAlert);
-            }
-            else {
-                alert(result["msg"]);
-            }
-        }, this);
-        request.addEventListener(egret.IOErrorEvent.IO_ERROR, function () {
-            alert("numdown5　post error : " + event);
-        }, this);
-    };
-    //接口-请求单词
-    Games.prototype.getWords = function (type) {
-        var params = "?vuid=" + this._info._vuid +
-            "&key=" + this._info._key +
-            "&rands=" + this._info._rands + "&isfrom=1";
-        // let params = "?vuid=6&key=296aab45fdcfc1695ef7f1202893f461&rands=9&isfrom=1";
-        var request = new egret.HttpRequest();
-        request.responseType = egret.HttpResponseType.TEXT;
-        request.open(this._info._getWord + params, egret.HttpMethod.GET);
-        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        request.send();
-        request.addEventListener(egret.Event.COMPLETE, function () {
-            var result = JSON.parse(request.response);
-            console.log(result);
-            if (result["code"] == 0) {
-                for (var i = 0; i < result["data"].length; i++) {
-                    var dict = result["data"][i];
-                    this._wordsArray.push(dict);
-                }
-                console.log(this._wordsArray);
-                if (type == 1) {
-                    this.setupViews();
-                }
-            }
-            else {
-                alert(result["msg"]);
-            }
-        }, this);
-        request.addEventListener(egret.IOErrorEvent.IO_ERROR, function () {
-        }, this);
-    };
     //接口-增加分数
     Games.prototype.plusScore = function (score) {
-        var params = "?vuid=" + this._info._vuid +
-            "&rands=" + this._info._rands +
-            "&tid=" + this._tid +
-            "&md5=" + score +
-            "&timenum=" + this._info._timenum +
-            "&activitynum=" + this._info._activitynum +
-            "&isfrom=" + this._info._isfrom;
-        var request = new egret.HttpRequest();
-        request.responseType = egret.HttpResponseType.TEXT;
-        request.open(this._info._typosTempjump + params, egret.HttpMethod.GET);
-        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        request.send();
-        request.addEventListener(egret.Event.COMPLETE, function () {
-            var result = JSON.parse(request.response);
-        }, this);
-        request.addEventListener(egret.IOErrorEvent.IO_ERROR, function () {
-            // alert("typostempjump　post error : " + event);
-        }, this);
+        // let params = "?vuid=" + this._info._vuid + 
+        // 			 "&rands=" + this._info._rands + 
+        // 			 "&tid=" + this._tid + 
+        // 			 "&md5=" + score + 
+        // 			 "&timenum=" + this._info._timenum + 
+        // 			 "&activitynum=" + this._info._activitynum + 
+        // 			 "&isfrom=" + this._info._isfrom;
+        // let request = new egret.HttpRequest();
+        // request.responseType = egret.HttpResponseType.TEXT;
+        // request.open(this._info._typosTempjump+params, egret.HttpMethod.GET);
+        // request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        // request.send();
+        // request.addEventListener(egret.Event.COMPLETE, function() {
+        // 	let result = JSON.parse(request.response);
+        // }, this);
+        // request.addEventListener(egret.IOErrorEvent.IO_ERROR, function() {
+        // }, this);
     };
     //接口-游戏结束
     Games.prototype.gameOverSubmitScore = function () {
-        var params = "?score=" + this._score +
-            "&vuid=" + this._info._vuid +
-            "&key=" + this._info._key +
-            "&rands=" + this._info._rands +
-            "&timenum=" + this._info._timenum +
-            "&activitynum=" + this._info._activitynum +
-            "&isfrom=" + this._info._isfrom;
-        var request = new egret.HttpRequest();
-        request.responseType = egret.HttpResponseType.TEXT;
-        request.open(this._info._gameover + params, egret.HttpMethod.GET);
-        request.send();
-        console.log(this._info._gameover + params);
-        request.addEventListener(egret.Event.COMPLETE, function () {
-            var result = JSON.parse(request.response);
-            console.log(result);
-            if (result["code"] == 0) {
-                var highScore = result["data"]["score"];
-                if (this._score > parseInt(highScore)) {
-                    highScore = this._score;
-                }
-                this._normalAlert = new Alert(Alert.GamePageScore, this._score.toString(), highScore, result["data"]["order"], result["data"]["text"], this._stageW, this._stageH);
-                this._normalAlert.addEventListener(AlertEvent.Ranking, this.checkRanking, this);
-                this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
-                this.addChild(this._normalAlert);
-            }
-            else {
-                alert(result["msg"]);
-            }
-        }, this);
-        request.addEventListener(egret.IOErrorEvent.IO_ERROR, function () {
-            alert("GameOver　post error : " + event);
-        }, this);
+        alert("game over");
+        // var params = "?score=" + this._score + 
+        // 			 "&vuid=" + this._info._vuid +
+        // 			 "&key=" + this._info._key + 
+        // 			 "&rands=" + this._info._rands + 
+        // 			 "&timenum=" + this._info._timenum + 
+        // 			 "&activitynum=" + this._info._activitynum + 
+        // 			 "&isfrom=" + this._info._isfrom;
+        // var request = new egret.HttpRequest();
+        // request.responseType = egret.HttpResponseType.TEXT;
+        // request.open(this._info._gameover + params, egret.HttpMethod.GET);
+        // request.send();
+        // console.log(this._info._gameover + params);
+        // request.addEventListener(egret.Event.COMPLETE, function() {
+        // 	let result = JSON.parse(request.response);
+        // 	console.log(result);
+        // 	if (result["code"] == 0) {
+        // 		let highScore = result["data"]["score"];
+        // 		if(this._score > parseInt(highScore)){
+        // 			highScore = this._score;
+        // 		}
+        // 		this._normalAlert = new Alert(Alert.GamePageScore, this._score.toString(), highScore,result["data"]["order"], result["data"]["text"],this._stageW,this._stageH);
+        // 		this._normalAlert.addEventListener(AlertEvent.Ranking, this.checkRanking, this);
+        // 		this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
+        // 		this.addChild(this._normalAlert);
+        // 	} else {
+        // 		alert(result["msg"]);
+        // 	}
+        // }, this);
+        // request.addEventListener(egret.IOErrorEvent.IO_ERROR, function() {
+        //     alert("GameOver　post error : " + event);
+        // }, this);
     };
     //重玩
     Games.prototype.restartGame = function () {

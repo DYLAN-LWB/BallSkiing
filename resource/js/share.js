@@ -4,8 +4,8 @@ var WxShareData = {
     link: "", //"" + sharelink,
     imgUrl: ""
 };
-var _baseUrl = interface_url;
-//var _baseUrl = "//ceshi.beisu100.com";
+// var _baseUrl = interface_url;
+var _baseUrl = "//ceshi.beisu100.com";
 
 var sharelink = window.location.href;
 function share(shareconfig) {
