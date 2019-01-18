@@ -24,7 +24,6 @@ var Games = (function (_super) {
         _this._ballMoveSpeed = 10; //小球移动速度
         _this._bgMoveSpeed = 10; //背景移动速度
         _this._baseSpeed = 1; //速度系数,加速时增加
-        _this._isSpeedUp = false; //是否加速
         _this._isFitstApperar = true; //游戏开始障碍物位置在下方,避免一出来就死
         _this._locusW = 8; //初始轨迹宽度
         _this._locusPointAaray = []; //轨迹点数组
@@ -39,21 +38,22 @@ var Games = (function (_super) {
         return _this;
     }
     Games.prototype.createGameScene = function () {
+        var minusH = 0;
+        if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
+            minusH = window.screen.availHeight > 811 ? 88 : 64;
+        }
+        else if (/(Android)/i.test(navigator.userAgent)) {
+            minusH = 1 ? 88 : 64;
+        }
+        var ua = window.navigator.userAgent.toLowerCase();
+        if (ua.match(/MicroMessenger/i) == 'micromessenger') {
+            //微信要减去底部的返回条的高度
+            minusH += 30;
+        }
+        var width = window.screen.availWidth * window.devicePixelRatio;
+        var height = (window.screen.availHeight - minusH) * window.devicePixelRatio;
+        this.stage.setContentSize(750, 750 * height / (width > 680 ? 680 : width));
         //屏幕适配
-        // var ua = window.navigator.userAgent.toLowerCase();
-        // if(ua.match(/MicroMessenger/i) == 'micromessenger'){    //微信
-        //     if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) { //判断iPhone|iPad|iPod|iOS
-        //                 this.stage.setContentSize(750,1218);
-        //                 } else if (/(Android)/i.test(navigator.userAgent)) {  //判断Android
-        //                     this.stage.setContentSize(750,1196); 
-        //                 }
-        // } else {
-        //     if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) { //判断iPhone|iPad|iPod|iOS
-        //         this.stage.setContentSize(750,1218);
-        //     } else if (/(Android)/i.test(navigator.userAgent)) {  //判断Android
-        //         this.stage.setContentSize(750,1298);
-        //     }
-        // }
         this._stageW = this.stage.stageWidth;
         this._stageH = this.stage.stageHeight;
         // this._info._vuid = localStorage.getItem("vuid").replace(/"/g,"");
@@ -256,11 +256,9 @@ var Games = (function (_super) {
         this._gameTimer = new egret.Timer(1000, 99999);
         this._gameTimer.addEventListener(egret.TimerEvent.TIMER, function () {
             //改变分数
-            // if(!this._isSpeedUp) {
             this._score++;
             this._scoreTextField.text = "" + this._score;
             this.plusScore(1);
-            // }
         }, this);
         this._gameTimer.start();
     };
@@ -526,9 +524,6 @@ var Games = (function (_super) {
         music.volume = 0.4;
         var text = tf["name"];
         if (text == this._missLetter) {
-            // let sound:egret.Sound = RES.getRes("speedup_mp3");
-            // var music = sound.play(0,1);
-            // music.volume = 0.4;
             this._missLetter = "none";
             var countDownImg_1 = new Bitmap("plus_png");
             countDownImg_1.x = this._ball.x;
@@ -546,8 +541,6 @@ var Games = (function (_super) {
             var playWord = this._wordTextField.text.replace("(", "");
             playWord = playWord.replace(")", "");
             this.playTheWord(playWord);
-            // this._isSpeedUp = true;
-            // this._baseSpeed = 1;
             //加20分
             this._score += 20;
             this._scoreTextField.text = "" + this._score;
@@ -555,19 +548,6 @@ var Games = (function (_super) {
             egret.setTimeout(function () {
                 this.updateWord();
             }, this, 3000);
-            //改变分数
-            // let speedTimer = new egret.Timer(100, 20);
-            // speedTimer.addEventListener(egret.TimerEvent.TIMER, function() {
-            // 	this._score++;
-            // 	this._scoreTextField.text = "" + this._score;
-            // }, this);
-            // speedTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, function() {
-            // 	this.updateWord();	
-            // 	this._isSpeedUp = false;
-            // 	this._baseSpeed = 1;
-            // 	this.plusScore(20);
-            // }, this);
-            // speedTimer.start();
         }
     };
     Games.prototype.playTheWord = function (word) {
@@ -678,7 +658,10 @@ var Games = (function (_super) {
     };
     //接口-游戏结束
     Games.prototype.gameOverSubmitScore = function () {
-        alert("game over");
+        this._normalAlert = new Alert(Alert.GamePageScore, this._score.toString(), this._score.toString(), "先不要点排行榜", 0, this._stageW, this._stageH);
+        this._normalAlert.addEventListener(AlertEvent.Ranking, this.checkRanking, this);
+        this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
+        this.addChild(this._normalAlert);
         // var params = "?score=" + this._score + 
         // 			 "&vuid=" + this._info._vuid +
         // 			 "&key=" + this._info._key + 

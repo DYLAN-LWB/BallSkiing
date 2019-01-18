@@ -28,37 +28,11 @@ class Alert extends egret.Sprite {
     }
 
     public initView() {
-        var bg;
-        if(this.type == 3){
-            bg = new Bitmap("black_png");
-        } else {
-            bg = new Bitmap("black_png");
-        }
-        
-        //屏幕适配
-        var ua = window.navigator.userAgent.toLowerCase();
-        if(ua.match(/MicroMessenger/i) == 'micromessenger'){    //微信
-
-            if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) { //判断iPhone|iPad|iPod|iOS
-                        bg.height = 1218;
-                        bg.width = 750;
-                        } else if (/(Android)/i.test(navigator.userAgent)) {  //判断Android
-                            bg.height = 1196;
-                            bg.width = 750;  
-                        }
-        } else {
-            if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) { //判断iPhone|iPad|iPod|iOS
-                        bg.height = 1218;
-                        bg.width = 750;
-            } else if (/(Android)/i.test(navigator.userAgent)) {  //判断Android
-                        bg.height = 1298;
-                        bg.width = 750;  
-            }
-        }
+        var bg = new Bitmap("black_png");
+        bg.width = this.screenwith;
+        bg.height = this.screenHeight;
         bg.touchEnabled = true;
         this.addChild(bg);
-
-
         
         switch (this.type) {
             case 1:

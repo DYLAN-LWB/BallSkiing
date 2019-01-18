@@ -1,0 +1,123 @@
+{
+	"groups": [
+		{
+			"keys": "description_json,countdown_mp3,bg_mp3,eat_mp3,gamebody_json,Eword_json,ball_png,tree_png,speed_json,speed_png,boom_mp3,speedup_mp3,attention_png,shareGui_png,black_png,count_1_png,count_2_png,count_3_png,readygo_mp3,plus_png",
+			"name": "preload"
+		}
+	],
+	"resources": [
+		{
+			"url": "config/description.json",
+			"type": "json",
+			"name": "description_json"
+		},
+		{
+			"url": "sound/countdown.mp3",
+			"type": "sound",
+			"name": "countdown_mp3"
+		},
+		{
+			"url": "sound/bg.mp3",
+			"type": "sound",
+			"name": "bg_mp3"
+		},
+		{
+			"url": "sound/eat.mp3",
+			"type": "sound",
+			"name": "eat_mp3"
+		},
+		{
+			"url": "game/gamebody.json",
+			"type": "sheet",
+			"name": "gamebody_json",
+			"subkeys": "balloon,beibei,btn_03,btn_05,di,drawboard,ending,list,prompt_03,quicken,ranking,return,start,tan,title,yun01,yun02,yun03,yun04"
+		},
+		{
+			"url": "game/guide.json",
+			"type": "json",
+			"name": "guide_json"
+		},
+		{
+			"url": "game/gamebody.json",
+			"type": "sheet",
+			"name": "gamebody_json",
+			"subkeys": "balloon,beibei,btn_03,btn_05,di,drawboard,ending,list,prompt_03,quicken,ranking,return,start,tan,title,yun01,yun02,yun03,yun04"
+		},
+		{
+			"name": "Eword_json",
+			"type": "sheet",
+			"url": "game/Eword.json",
+			"subkeys": "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z"
+		},
+		{
+			"name": "ball_png",
+			"type": "image",
+			"url": "game/ball.png"
+		},
+		{
+			"name": "tree_png",
+			"type": "image",
+			"url": "game/tree.png"
+		},
+		{
+			"name": "speed_json",
+			"type": "json",
+			"url": "game/speed.json"
+		},
+		{
+			"name": "speed_png",
+			"type": "image",
+			"url": "game/speed.png"
+		},
+		{
+			"name": "boom_mp3",
+			"type": "sound",
+			"url": "sound/boom.mp3"
+		},
+		{
+			"name": "speedup_mp3",
+			"type": "sound",
+			"url": "sound/speedup.mp3"
+		},
+		{
+			"name": "attention_png",
+			"type": "image",
+			"url": "game/attention.png"
+		},
+		{
+			"name": "shareGui_png",
+			"type": "image",
+			"url": "game/shareGui.png"
+		},
+		{
+			"name": "black_png",
+			"type": "image",
+			"url": "game/black.png"
+		},
+		{
+			"name": "count_1_png",
+			"type": "image",
+			"url": "game/count_1.png"
+		},
+		{
+			"name": "count_2_png",
+			"type": "image",
+			"url": "game/count_2.png"
+		},
+		{
+			"name": "count_3_png",
+			"type": "image",
+			"url": "game/count_3.png"
+		},
+		{
+			"name": "readygo_mp3",
+			"type": "sound",
+			"url": "sound/readygo.mp3"
+		},
+		{
+			"name": "plus_png",
+			"type": "image",
+			"url": "game/plus.png"
+		}
+	]
+}

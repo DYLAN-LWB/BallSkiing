@@ -23,8 +23,7 @@ class Games extends egret.DisplayObjectContainer {
 	private _ballMoveSpeed = 10;	//小球移动速度
 	private _bgMoveSpeed = 10;	//背景移动速度
 	private _baseSpeed = 1;		//速度系数,加速时增加
-	private _isSpeedUp:boolean = false;	//是否加速
-	private _guide;	//加速时小球的动画
+	private _guide;	//小球的动画
 	private _isFitstApperar:boolean = true;	//游戏开始障碍物位置在下方,避免一出来就死
 
 	private _locusW = 8;	//初始轨迹宽度
@@ -51,25 +50,29 @@ class Games extends egret.DisplayObjectContainer {
 
 	
 	private createGameScene() {
+
+		let minusH = 0;
+		if(/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
+			minusH = window.screen.availHeight > 811 ? 88 : 64;		
+		} else if(/(Android)/i.test(navigator.userAgent)) { 
+			minusH = 1 ? 88 : 64;
+		}
+
+		var ua = window.navigator.userAgent.toLowerCase();
+		if(ua.match(/MicroMessenger/i) == 'micromessenger') { 
+			//微信要减去底部的返回条的高度
+			minusH += 30;
+		}
+
+		let width = window.screen.availWidth*window.devicePixelRatio;
+		let height = (window.screen.availHeight-minusH)*window.devicePixelRatio;
+
+		this.stage.setContentSize(750, 750*height/(width > 680 ? 680 : width));
+
 		//屏幕适配
-        // var ua = window.navigator.userAgent.toLowerCase();
-        // if(ua.match(/MicroMessenger/i) == 'micromessenger'){    //微信
-
-        //     if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) { //判断iPhone|iPad|iPod|iOS
-        //                 this.stage.setContentSize(750,1218);
-        //                 } else if (/(Android)/i.test(navigator.userAgent)) {  //判断Android
-        //                     this.stage.setContentSize(750,1196); 
-        //                 }
-        // } else {
-        //     if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) { //判断iPhone|iPad|iPod|iOS
-        //         this.stage.setContentSize(750,1218);
-        //     } else if (/(Android)/i.test(navigator.userAgent)) {  //判断Android
-        //         this.stage.setContentSize(750,1298);
-        //     }
-        // }
-
-		this._stageW = this.stage.stageWidth;
+		this._stageW = this.stage.stageWidth; 
 		this._stageH = this.stage.stageHeight;
+
 
 		// this._info._vuid = localStorage.getItem("vuid").replace(/"/g,"");
 		// this._info._key = localStorage.getItem("key").replace(/"/g,"");
@@ -295,12 +298,10 @@ class Games extends egret.DisplayObjectContainer {
 		//游戏计时器
 		this._gameTimer = new egret.Timer(1000, 99999);
 		this._gameTimer.addEventListener(egret.TimerEvent.TIMER, function() {
-			//改变分数
-			// if(!this._isSpeedUp) {
-				this._score++;
-				this._scoreTextField.text = "" + this._score;
-				this.plusScore(1);
-			// }
+		//改变分数
+		this._score++;
+		this._scoreTextField.text = "" + this._score;
+		this.plusScore(1);
 
 		}, this);
         this._gameTimer.start();
@@ -519,7 +520,7 @@ class Games extends egret.DisplayObjectContainer {
 		}, this, 600, "param");
 	}
 	//减速
- 	private bufferTimerFunc(event:egret.TimerEvent) {445301354
+ 	private bufferTimerFunc(event:egret.TimerEvent) {
 		this._ballMoveSpeed -= 0.5;
 		if(this._ballMoveSpeed < 0) {
 			this._ballMoveSpeed = 0;
@@ -593,9 +594,6 @@ class Games extends egret.DisplayObjectContainer {
 		let text = tf["name"];
 		if(text == this._missLetter) {
 
-			// let sound:egret.Sound = RES.getRes("speedup_mp3");
-			// var music = sound.play(0,1);
-			// music.volume = 0.4;
 			this._missLetter = "none";
 
 			let countDownImg  = new Bitmap("plus_png");
@@ -618,8 +616,6 @@ class Games extends egret.DisplayObjectContainer {
 			playWord = playWord.replace(")","");
 			this.playTheWord(playWord);
 
-			// this._isSpeedUp = true;
-			// this._baseSpeed = 1;
 			//加20分
 			this._score += 20;
 			this._scoreTextField.text = "" + this._score;
@@ -627,20 +623,6 @@ class Games extends egret.DisplayObjectContainer {
 			egret.setTimeout(function() {
 				this.updateWord();
 			}, this, 3000);
-
-			//改变分数
-			// let speedTimer = new egret.Timer(100, 20);
-			// speedTimer.addEventListener(egret.TimerEvent.TIMER, function() {
-			// 	this._score++;
-			// 	this._scoreTextField.text = "" + this._score;
-			// }, this);
-			// speedTimer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, function() {
-			// 	this.updateWord();	
-			// 	this._isSpeedUp = false;
-			// 	this._baseSpeed = 1;
-			// 	this.plusScore(20);
-			// }, this);
-			// speedTimer.start();
 		}
 	}
 
@@ -762,7 +744,11 @@ class Games extends egret.DisplayObjectContainer {
 
 	//接口-游戏结束
     private gameOverSubmitScore() {
-		alert("game over");
+
+		this._normalAlert = new Alert(Alert.GamePageScore, this._score.toString(), this._score.toString(),"先不要点排行榜", 0, this._stageW,this._stageH);
+		this._normalAlert.addEventListener(AlertEvent.Ranking, this.checkRanking, this);
+		this._normalAlert.addEventListener(AlertEvent.Restart, this.restartGame, this);
+		this.addChild(this._normalAlert);
 
         // var params = "?score=" + this._score + 
 		// 			 "&vuid=" + this._info._vuid +
